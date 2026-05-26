@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>21 · quick filter</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>21 — Quick filter</h1>
+<p>Filters by task name (and id) substring. Matches keep their parent visible.</p>
+<div class="toolbar">
+  <input id="filter" type="search" placeholder="type to filter…" />
+</div>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="week">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design website" data-task-start="2026-06-01" data-task-end="2026-06-08"></li>
+    <li data-task-id="2" data-task-name="Build website"  data-task-start="2026-06-09" data-task-end="2026-06-20"></li>
+    <li data-task-id="3" data-task-name="Hire designer"  data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="4" data-task-name="Marketing plan" data-task-start="2026-06-10" data-task-end="2026-06-20"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.getElementById('filter').addEventListener('input', (e) => {
+    document.getElementById('chart').ganttApi.setQuickFilter(e.target.value);
+  });
+</script>
+</body></html>

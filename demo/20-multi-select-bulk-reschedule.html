@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>20 · bulk reschedule</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>20 — Multi-select bulk reschedule</h1>
+<p>Shift / Cmd-click bars to multi-select; press <kbd>Ctrl+←/→</kbd> to shift all by one snap.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-editable-value="true"
+     data-gantt-task-selection-value="multiple">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-03"></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-04" data-task-end="2026-06-08"></li>
+    <li data-task-id="3" data-task-name="C" data-task-start="2026-06-09" data-task-end="2026-06-14"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

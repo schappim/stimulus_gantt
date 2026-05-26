@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>19 · 10k tasks</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>19 — 10 000 tasks (virtualised)</h1>
+<p>Row virtualisation kicks in past <code>row-virtual-threshold</code> (default 200).</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="week"
+     data-gantt-row-virtualization-value="true"></div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.getElementById('chart');
+  chart.addEventListener('gantt:ready', (e) => {
+    const tasks = [];
+    const start = new Date('2026-01-01T00:00:00Z').getTime();
+    for (let i = 0; i < 10000; i++) {
+      const s = new Date(start + i * 86400000);
+      const en = new Date(s.getTime() + (i % 5 + 1) * 86400000);
+      tasks.push({
+        id: `t${i}`,
+        name: `Task ${i + 1}`,
+        start: s.toISOString().slice(0, 10),
+        end: en.toISOString().slice(0, 10),
+        progress: (i % 11) / 10,
+      });
+    }
+    e.detail.api.setTaskData(tasks);
+  });
+</script>
+</body></html>

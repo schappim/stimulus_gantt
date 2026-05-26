@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>06 · drag to link</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>06 — Create a dependency by drag</h1>
+<p>Hover a task bar to reveal the link handle; drag from one bar to another to add a FS dependency.</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-editable-value="true"
+     data-gantt-task-link-editable-value="true"
+     data-gantt-add-dependency-affordance-value="true"
+     data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design" data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="Build" data-task-start="2026-06-06" data-task-end="2026-06-15"></li>
+    <li data-task-id="3" data-task-name="QA"    data-task-start="2026-06-16" data-task-end="2026-06-20"></li>
+  </ol>
+</div>
+<div class="log" id="log">drag from a bar's right edge to a target →</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const log = document.getElementById('log');
+  document.getElementById('chart').addEventListener('gantt:dependencyAdded', (e) =>
+    log.textContent = JSON.stringify(e.detail, null, 2) + '\n' + log.textContent);
+</script>
+</body></html>

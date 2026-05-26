@@ -1,0 +1,3 @@
+/* Re-export the JS package's stylesheet. Replace with the contents of
+ * `dist/stimulus_gantt.css` via bin/sync-rails-assets. */
+@import url('/assets/stimulus_gantt.css');

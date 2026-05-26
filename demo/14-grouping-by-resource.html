@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>14 · grouping by resource</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>14 — Group by field</h1>
+<p>Group the WBS by any task field. (Programmatic, via <code>ganttApi.setGroupBy</code>.)</p>
+<div class="toolbar">
+  <button data-group="">flat</button>
+  <button data-group="resource">by resource</button>
+  <button data-group="status">by status</button>
+</div>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design"  data-task-start="2026-06-01" data-task-end="2026-06-05" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="2" data-task-name="Build A" data-task-start="2026-06-06" data-task-end="2026-06-15" data-task-resource-ids='["sam"]'></li>
+    <li data-task-id="3" data-task-name="Build B" data-task-start="2026-06-06" data-task-end="2026-06-15" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="4" data-task-name="QA"      data-task-start="2026-06-16" data-task-end="2026-06-20" data-task-resource-ids='["sam"]'></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.querySelectorAll('[data-group]').forEach((b) => {
+    b.addEventListener('click', () => document.getElementById('chart').ganttApi.setGroupBy(b.dataset.group || null));
+  });
+</script>
+</body></html>

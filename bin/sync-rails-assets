@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Copies the freshly built JS / CSS bundle into the gem's asset paths.
+# Run after `npm run build:lib`.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+GEM_JS="$ROOT/gem/stimulus_gantt_rails/app/assets/javascripts"
+GEM_CSS="$ROOT/gem/stimulus_gantt_rails/app/assets/stylesheets"
+
+if [ ! -f "$ROOT/dist/stimulus_gantt.esm.js" ]; then
+  echo "missing dist/stimulus_gantt.esm.js — run npm run build:lib first" >&2
+  exit 1
+fi
+
+mkdir -p "$GEM_JS" "$GEM_CSS"
+cp "$ROOT/dist/stimulus_gantt.esm.js" "$GEM_JS/stimulus_gantt.js"
+cp "$ROOT/dist/stimulus_gantt.css"    "$GEM_CSS/stimulus_gantt.css"
+
+echo "Synced dist/* → gem/stimulus_gantt_rails/app/assets/*"

@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>30 · toolbar controller</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>30 — Toolbar controller (zoom / filter / view buttons)</h1>
+<div data-controller="gantt-toolbar" data-gantt-toolbar-target-value="chart" class="toolbar"></div>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="week">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-08"></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-09" data-task-end="2026-06-18"></li>
+    <li data-task-id="3" data-task-name="C" data-task-start="2026-06-19" data-task-end="2026-06-25"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

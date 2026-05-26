@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>29 · keyboard</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>29 — Keyboard nav</h1>
+<p>Focus the chart and use <kbd>+</kbd>/<kbd>-</kbd> to zoom, <kbd>Ctrl+←/→</kbd> to shift selection, <kbd>Tab</kbd> to indent.</p>
+<div class="chart" tabindex="0" data-controller="gantt" data-gantt-view-value="day" data-gantt-editable-value="true" data-gantt-task-selection-value="multiple">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-06" data-task-end="2026-06-10"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

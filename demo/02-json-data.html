@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<title>02 · JSON data</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>02 — JSON-fed Gantt</h1>
+<p>Tasks supplied imperatively after <code>gantt:ready</code>.</p>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="week"></div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.querySelector('#chart');
+  chart.addEventListener('gantt:ready', (e) => {
+    e.detail.api.setTaskData([
+      { id: '1', name: 'Discovery', start: '2026-06-01', end: '2026-06-04', progress: 1 },
+      { id: '2', name: 'Design',    start: '2026-06-05', end: '2026-06-12', progress: 0.7 },
+      { id: '3', name: 'Build',     start: '2026-06-12', end: '2026-06-26', progress: 0.3 },
+      { id: '4', name: 'QA',        start: '2026-06-22', end: '2026-06-30', progress: 0 },
+      { id: '5', name: 'Launch',    start: '2026-07-01', milestone: true },
+    ]);
+    e.detail.api.setDependencyData([
+      { id: 'd1', from: '1', to: '2', type: 'FS' },
+      { id: 'd2', from: '2', to: '3', type: 'FS' },
+      { id: 'd3', from: '3', to: '4', type: 'SS', lag: '2d' },
+      { id: 'd4', from: '4', to: '5', type: 'FS' },
+    ]);
+  });
+</script>
+</body></html>

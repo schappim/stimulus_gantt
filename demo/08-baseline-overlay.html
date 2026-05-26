@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>08 · baseline overlay</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>08 — Baseline overlay</h1>
+<p>Capture the current plan, drag a task, see the ghost baseline above the live bar.</p>
+<div class="toolbar">
+  <button id="capture">Capture baseline</button>
+</div>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-editable-value="true"
+     data-gantt-baseline-value="overlay">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design"  data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="Build"   data-task-start="2026-06-06" data-task-end="2026-06-15"></li>
+    <li data-task-id="3" data-task-name="QA"      data-task-start="2026-06-16" data-task-end="2026-06-20"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.querySelector('#chart');
+  chart.addEventListener('gantt:ready', () => {
+    document.getElementById('capture').addEventListener('click', () => {
+      chart.ganttApi.captureBaseline({ id: 'v1', name: 'Kickoff' });
+      chart.ganttApi.setActiveBaseline('v1');
+    });
+  });
+</script>
+</body></html>

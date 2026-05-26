@@ -1,0 +1,40 @@
+<%# Render the chart with the supplied tasks / dependencies / resources.
+    `gantt` is a StimulusGanttRails::Gantt instance. %>
+<%= turbo_stream_from(*StimulusGanttRails.streamables_for(gantt.class._resource)) %>
+
+<div data-controller="gantt gantt-sync"
+     class="sg-host"
+     data-gantt-view-value="<%= local_assigns[:view] || 'week' %>"
+     data-gantt-editable-value="<%= local_assigns[:editable] ? 'true' : 'false' %>"
+     data-gantt-critical-path-value="<%= local_assigns[:critical_path] ? 'true' : 'false' %>"
+     data-gantt-task-selection-value="<%= local_assigns[:task_selection] || 'single' %>"
+     data-gantt-broadcast-value="turbo-stream"
+     data-gantt-broadcast-channel-value="<%= gantt.class._resource %>"
+     data-gantt-calendars-value="<%= gantt.calendars_as_json.to_json %>"
+     style="height: <%= local_assigns[:height] || '640px' %>">
+  <ol class="sg-tasks">
+    <% Array(tasks).each do |task| %>
+      <li data-task-id="<%= task.id %>"
+          data-task-name="<%= task.try(:name) %>"
+          <%= task.try(:start) ? "data-task-start=\"#{task.start.iso8601}\"".html_safe : '' %>
+          <%= task.try(:end)   ? "data-task-end=\"#{task.end.iso8601}\"".html_safe : '' %>
+          <%= task.try(:milestone) ? 'data-task-milestone="true"' : '' %>
+          <%= task.try(:summary)   ? 'data-task-summary="true"' : '' %>
+          <%= task.try(:parent_id) ? "data-task-parent-id=\"#{task.parent_id}\"".html_safe : '' %>
+          <%= task.try(:progress)  ? "data-task-progress=\"#{task.progress}\"".html_safe : '' %>
+          <%= task.try(:resource_ids).present? ? "data-task-resource-ids='#{task.resource_ids.to_json}'".html_safe : '' %>
+      ></li>
+    <% end %>
+  </ol>
+
+  <ol class="sg-dependencies" hidden>
+    <% Array(local_assigns[:dependencies]).each do |dep| %>
+      <li data-dependency-id="<%= dep.id %>"
+          data-dependency-from="<%= dep.try(:from) %>"
+          data-dependency-to="<%= dep.try(:to) %>"
+          data-dependency-type="<%= dep.try(:type) || 'FS' %>"
+          <%= dep.try(:lag).present? ? "data-dependency-lag=\"#{dep.lag}\"".html_safe : '' %>
+      ></li>
+    <% end %>
+  </ol>
+</div>

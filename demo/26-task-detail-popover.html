@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>26 · detail popover</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>26 — Task detail popover</h1>
+<p>Double-click a bar to open the popover (templated).</p>
+<template id="task-detail-tpl">
+  <article>
+    <h3 data-bind="name"></h3>
+    <p>Start: <span data-bind="start"></span></p>
+    <p>End: <span data-bind="end"></span></p>
+    <p>Progress: <span data-bind="progress"></span></p>
+  </article>
+</template>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-08" data-task-progress="0.6"></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-09" data-task-end="2026-06-15"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.getElementById('chart');
+  chart.addEventListener('gantt:taskClicked', (e) => {
+    chart.ganttApi.openTaskDetail(e.detail.taskId);
+  });
+</script>
+</body></html>

@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>09 · baseline compare</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>09 — Baseline compare</h1>
+<p>Two stacked tracks per row: baseline above, current below.</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-row-height-value="48"
+     data-gantt-baseline-value="compare"
+     data-gantt-editable-value="true">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design"  data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="Build"   data-task-start="2026-06-06" data-task-end="2026-06-15"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.querySelector('#chart');
+  chart.addEventListener('gantt:ready', (e) => {
+    e.detail.api.captureBaseline({ id: 'b1', name: 'Kickoff' });
+    e.detail.api.setActiveBaseline('b1');
+    // Slip task 2 forward 3 days so you can see the contrast.
+    e.detail.api.updateTask({ id: '2', name: 'Build', start: '2026-06-09', end: '2026-06-18' });
+  });
+</script>
+</body></html>

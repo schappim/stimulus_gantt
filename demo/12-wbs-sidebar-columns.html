@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>12 · sidebar columns</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>12 — Configurable WBS sidebar columns</h1>
+<p>Sidebar columns declared via <code>data-gantt-sidebar-columns-value</code> JSON.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="week"
+     data-gantt-sidebar-width-value="480"
+     data-gantt-wbs-numbering-value="true"
+     data-gantt-sidebar-columns-value='[
+       {"field":"wbs","header":"#","width":40,"align":"right","frozen":true},
+       {"field":"name","header":"Task","width":200,"frozen":true},
+       {"field":"start","header":"Start","width":90},
+       {"field":"end","header":"End","width":90},
+       {"field":"duration","header":"Dur","width":60},
+       {"field":"progress","header":"%","width":50},
+       {"field":"resources","header":"Owner","width":110}
+     ]'>
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design"  data-task-start="2026-06-01" data-task-end="2026-06-08" data-task-progress="0.5" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="2" data-task-name="Build"   data-task-start="2026-06-09" data-task-end="2026-06-25" data-task-progress="0.2" data-task-resource-ids='["sam"]'></li>
+    <li data-task-id="3" data-task-name="QA"      data-task-start="2026-06-26" data-task-end="2026-07-02" data-task-resource-ids='["sam","alex"]'></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.querySelector('[data-controller="gantt"]').addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([
+      { id: 'alex', name: 'Alex' },
+      { id: 'sam', name: 'Sam' },
+    ]);
+  });
+</script>
+</body></html>

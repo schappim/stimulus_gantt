@@ -1,0 +1,43 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>07 · critical path</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>07 — Critical path</h1>
+<p>Tasks on the longest dependency chain are flagged red. Toggle with the button below.</p>
+<div class="toolbar">
+  <button id="toggle">Toggle critical path</button>
+</div>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-critical-path-value="true">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Discovery" data-task-start="2026-06-01" data-task-end="2026-06-04"></li>
+    <li data-task-id="2" data-task-name="Design"    data-task-start="2026-06-05" data-task-end="2026-06-15"></li>
+    <li data-task-id="3" data-task-name="Build A"   data-task-start="2026-06-16" data-task-end="2026-07-04"></li>
+    <li data-task-id="4" data-task-name="Build B"   data-task-start="2026-06-16" data-task-end="2026-06-25"></li>
+    <li data-task-id="5" data-task-name="QA"        data-task-start="2026-07-05" data-task-end="2026-07-12"></li>
+    <li data-task-id="6" data-task-name="Launch"    data-task-start="2026-07-15" data-task-milestone="true"></li>
+  </ol>
+  <ol class="sg-dependencies" hidden>
+    <li data-dependency-from="1" data-dependency-to="2"></li>
+    <li data-dependency-from="2" data-dependency-to="3"></li>
+    <li data-dependency-from="2" data-dependency-to="4"></li>
+    <li data-dependency-from="3" data-dependency-to="5"></li>
+    <li data-dependency-from="4" data-dependency-to="5"></li>
+    <li data-dependency-from="5" data-dependency-to="6"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.querySelector('#chart');
+  let on = true;
+  document.querySelector('#toggle').addEventListener('click', () => {
+    on = !on;
+    chart.ganttApi.setCriticalPath(on);
+  });
+</script>
+</body></html>

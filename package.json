@@ -1,0 +1,73 @@
+{
+  "name": "@ninjaai/stimulus_gantt",
+  "version": "0.1.0",
+  "description": "HTML-first Gantt chart for Stimulus.js (Hotwire) — task bars, dependency arrows, critical path, baselines, WBS sidebar, calendars & working time, virtualised rows for 10k-task plans, live multi-user sync over Turbo Streams.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Marcus Schappi",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/schappim/stimulus_gantt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schappim/stimulus_gantt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/schappim/stimulus_gantt/issues"
+  },
+  "keywords": [
+    "stimulus",
+    "hotwire",
+    "turbo",
+    "gantt",
+    "gantt-chart",
+    "project-management",
+    "wbs",
+    "critical-path",
+    "cpm",
+    "scheduler",
+    "timeline",
+    "dependencies"
+  ],
+  "main": "dist/stimulus_gantt.esm.js",
+  "module": "dist/stimulus_gantt.esm.js",
+  "unpkg": "dist/stimulus_gantt.js",
+  "jsdelivr": "dist/stimulus_gantt.js",
+  "exports": {
+    ".": {
+      "import": "./dist/stimulus_gantt.esm.js",
+      "default": "./dist/stimulus_gantt.esm.js"
+    },
+    "./style.css": "./dist/stimulus_gantt.css",
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:lib": "FORMAT=iife vite build --config vite.lib.config.js && FORMAT=es vite build --config vite.lib.config.js",
+    "build:lib:iife": "FORMAT=iife vite build --config vite.lib.config.js",
+    "build:lib:esm": "FORMAT=es vite build --config vite.lib.config.js",
+    "build:lib:watch": "FORMAT=iife vite build --config vite.lib.config.js --watch",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build:lib && npm test"
+  },
+  "peerDependencies": {
+    "@hotwired/stimulus": "^3.2.2"
+  },
+  "devDependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "happy-dom": "^20.9.0",
+    "vite": "^6.4.2",
+    "vitest": "^3.2.4"
+  }
+}

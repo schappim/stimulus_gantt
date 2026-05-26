@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>18 · multi-calendar resources</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>18 — Per-resource calendars</h1>
+<p>Tasks inherit the calendar of their assigned resource; calendars are declared once and referenced by id.</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-calendars-value='{
+       "fulltime": {"weekdays":[1,2,3,4,5],"hours":[["09:00","17:00"]]},
+       "parttime": {"weekdays":[2,4],"hours":[["10:00","14:00"]]},
+       "247":      {"weekdays":[0,1,2,3,4,5,6],"hours":[["00:00","24:00"]]}
+     }'
+     data-gantt-calendar-value="fulltime">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Backend (Alex/full-time)"  data-task-start="2026-06-01" data-task-end="2026-06-08" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="2" data-task-name="Marketing (Sam/part-time)" data-task-start="2026-06-01" data-task-end="2026-06-12" data-task-resource-ids='["sam"]'></li>
+    <li data-task-id="3" data-task-name="Robot (24x7)"              data-task-start="2026-06-01" data-task-end="2026-06-06" data-task-resource-ids='["robot"]'></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.getElementById('chart').addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([
+      { id: 'alex',  name: 'Alex',  calendar: 'fulltime' },
+      { id: 'sam',   name: 'Sam',   calendar: 'parttime' },
+      { id: 'robot', name: 'Robot', calendar: '247', capacity: 5 },
+    ]);
+  });
+</script>
+</body></html>

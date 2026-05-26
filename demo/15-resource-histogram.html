@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>15 · histogram</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>15 — Resource histogram</h1>
+<p>Allocation per resource over time. Capacity line shaded; overallocation in red.</p>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-05" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-03" data-task-end="2026-06-08" data-task-resource-ids='["alex","sam"]'></li>
+    <li data-task-id="3" data-task-name="C" data-task-start="2026-06-04" data-task-end="2026-06-10" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="4" data-task-name="D" data-task-start="2026-06-07" data-task-end="2026-06-12" data-task-resource-ids='["sam"]'></li>
+  </ol>
+</div>
+<div data-controller="gantt-histogram" data-gantt-histogram-target-value="chart"></div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.getElementById('chart').addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([
+      { id: 'alex', name: 'Alex', capacity: 1 },
+      { id: 'sam',  name: 'Sam',  capacity: 1 },
+    ]);
+  });
+</script>
+</body></html>

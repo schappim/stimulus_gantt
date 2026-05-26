@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>05 · dependency arrows</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>05 — Dependency arrows (FS / SS / FF / SF)</h1>
+<div class="toolbar">
+  <button data-routing="orthogonal">orthogonal</button>
+  <button data-routing="smooth">smooth</button>
+  <button data-routing="straight">straight</button>
+</div>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-dependency-routing-value="orthogonal">
+  <ol class="sg-tasks">
+    <li data-task-id="A" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="B" data-task-name="B (FS-from-A)" data-task-start="2026-06-06" data-task-end="2026-06-10"></li>
+    <li data-task-id="C" data-task-name="C (SS-with-B)" data-task-start="2026-06-06" data-task-end="2026-06-12"></li>
+    <li data-task-id="D" data-task-name="D (FF-with-C)" data-task-start="2026-06-08" data-task-end="2026-06-12"></li>
+    <li data-task-id="E" data-task-name="E (SF-from-D)" data-task-start="2026-06-12" data-task-end="2026-06-14"></li>
+  </ol>
+  <ol class="sg-dependencies" hidden>
+    <li data-dependency-from="A" data-dependency-to="B" data-dependency-type="FS"></li>
+    <li data-dependency-from="B" data-dependency-to="C" data-dependency-type="SS"></li>
+    <li data-dependency-from="C" data-dependency-to="D" data-dependency-type="FF"></li>
+    <li data-dependency-from="D" data-dependency-to="E" data-dependency-type="SF"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.querySelector('#chart');
+  document.querySelectorAll('[data-routing]').forEach((b) => {
+    b.addEventListener('click', () => {
+      chart.dataset.ganttDependencyRoutingValue = b.dataset.routing;
+    });
+  });
+</script>
+</body></html>

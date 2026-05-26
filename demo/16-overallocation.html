@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>16 · overallocation</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>16 — Overallocation events</h1>
+<p>Listen to <code>gantt:overallocationDetected</code> to drive your own leveller.</p>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-08" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-01" data-task-end="2026-06-08" data-task-resource-ids='["alex"]'></li>
+    <li data-task-id="3" data-task-name="C" data-task-start="2026-06-01" data-task-end="2026-06-08" data-task-resource-ids='["alex"]'></li>
+  </ol>
+</div>
+<div data-controller="gantt-histogram" data-gantt-histogram-target-value="chart"></div>
+<div class="log" id="log"></div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const log = document.getElementById('log');
+  const chart = document.getElementById('chart');
+  chart.addEventListener('gantt:overallocationDetected', (e) =>
+    log.textContent = JSON.stringify(e.detail) + '\n' + log.textContent);
+  chart.addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([{ id: 'alex', name: 'Alex', capacity: 1 }]);
+  });
+</script>
+</body></html>

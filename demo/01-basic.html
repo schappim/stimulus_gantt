@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>stimulus_gantt · 01 basic</title>
+  <link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; color: #0f172a; }
+    main { max-width: 1080px; margin: 0 auto; }
+    h1 { font-size: 18px; margin-bottom: 4px; }
+    p  { margin: 0 0 16px; color: #64748b; }
+    .chart { height: 480px; border: 1px solid #e5e7eb; border-radius: 6px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>01 — Basic Gantt</h1>
+  <p>Tasks declared in HTML; controller hydrates on connect.</p>
+  <div class="chart"
+       data-controller="gantt"
+       data-gantt-view-value="week"
+       data-gantt-row-height-value="32">
+    <ol class="sg-tasks">
+      <li data-task-id="1" data-task-name="Design"
+          data-task-start="2026-06-01" data-task-end="2026-06-05"
+          data-task-progress="0.4"></li>
+      <li data-task-id="2" data-task-name="Build"
+          data-task-start="2026-06-08" data-task-end="2026-06-19"
+          data-task-progress="0"></li>
+      <li data-task-id="3" data-task-name="Launch"
+          data-task-start="2026-06-22"
+          data-task-milestone="true"></li>
+    </ol>
+    <ol class="sg-dependencies" hidden>
+      <li data-dependency-id="d1" data-dependency-from="1" data-dependency-to="2"></li>
+      <li data-dependency-id="d2" data-dependency-from="2" data-dependency-to="3"></li>
+    </ol>
+  </div>
+</main>
+<script type="module" src="../src/index.js"></script>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body>
+</html>

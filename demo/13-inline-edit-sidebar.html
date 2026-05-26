@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>13 · inline edit</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>13 — Inline edit via task editor template</h1>
+<p>Click the &quot;Edit&quot; button to open the registered editor template for a task.</p>
+<div class="toolbar">
+  <button id="edit">Edit selected</button>
+</div>
+<div class="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Design" data-task-start="2026-06-01" data-task-end="2026-06-05" data-task-progress="0.4"></li>
+    <li data-task-id="2" data-task-name="Build"  data-task-start="2026-06-06" data-task-end="2026-06-15"></li>
+  </ol>
+</div>
+<template id="task-editor">
+  <form>
+    <label>Name <input data-editor-input data-editor-field="name" /></label>
+    <label>Start <input type="date" data-editor-field="start" /></label>
+    <label>End <input type="date" data-editor-field="end" /></label>
+    <label>Progress <input type="number" min="0" max="1" step="0.05" data-editor-field="progress" /></label>
+    <div><button data-editor-commit type="submit">Save</button><button data-editor-cancel type="button">Cancel</button></div>
+  </form>
+</template>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  import GanttTaskEditorController from '../src/controllers/gantt_task_editor_controller.js';
+  const app = StimulusGantt.start();
+  app.register('gantt-task-editor', GanttTaskEditorController);
+  document.getElementById('edit').addEventListener('click', () => {
+    const chart = document.querySelector('[data-controller="gantt"]');
+    const ids = chart.ganttApi.getSelectedTaskIds();
+    if (!ids.length) return alert('Select a task first');
+    const host = document.createElement('div');
+    host.dataset.controller = 'gantt-task-editor';
+    host.dataset.ganttTaskEditorTaskIdValue = ids[0];
+    chart.appendChild(host);
+    queueMicrotask(() => {
+      const ctrl = app.getControllerForElementAndIdentifier(host, 'gantt-task-editor');
+      ctrl?.open({ target: chart });
+    });
+  });
+</script>
+</body></html>

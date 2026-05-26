@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>28 · custom bar renderer</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+<style>
+  .sg-bar.custom-bar { background: #fef3c7; color: #92400e; }
+  .sg-bar.custom-bar .icon { margin-right: 4px; }
+</style>
+</head><body>
+<main>
+<h1>28 — Custom bar renderer (registered programmatically)</h1>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day"
+     data-gantt-bar-renderer-value="default">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Important task" data-task-bar-renderer="annotated"
+        data-task-start="2026-06-01" data-task-end="2026-06-08"></li>
+    <li data-task-id="2" data-task-name="Ordinary task"  data-task-start="2026-06-09" data-task-end="2026-06-15"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt, { registerBarRenderer } from '../src/index.js';
+  registerBarRenderer('annotated', (task) => {
+    const div = document.createElement('div');
+    div.className = 'sg-bar custom-bar';
+    div.dataset.taskId = task.id;
+    div.innerHTML = `<span class="icon">★</span><span class="sg-bar-label">${task.name}</span>`;
+    return div;
+  });
+  StimulusGantt.start();
+</script>
+</body></html>

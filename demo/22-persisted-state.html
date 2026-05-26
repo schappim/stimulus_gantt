@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>22 · persisted state</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>22 — Persisted state (localStorage)</h1>
+<p>Reload — view + filter + collapsed state survive.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="week"
+     data-gantt-persist-key-value="demo22"
+     data-gantt-quick-filter-value=""
+     data-gantt-task-selection-value="multiple">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-04">
+      <ol>
+        <li data-task-id="1.1" data-task-name="A child"  data-task-start="2026-06-01" data-task-end="2026-06-03"></li>
+      </ol>
+    </li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-05" data-task-end="2026-06-10"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

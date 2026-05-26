@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>24 · MS Project XML</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>24 — MS Project XML round-trip</h1>
+<p>Export the current plan, then re-import the result.</p>
+<div class="toolbar"><button id="export">Export</button><button id="import">Re-import</button></div>
+<pre id="xml" class="log"></pre>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="A" data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="B" data-task-start="2026-06-05" data-task-end="2026-06-12"></li>
+    <li data-task-id="3" data-task-name="Launch" data-task-start="2026-06-15" data-task-milestone="true"></li>
+  </ol>
+  <ol class="sg-dependencies" hidden>
+    <li data-dependency-from="1" data-dependency-to="2"></li>
+    <li data-dependency-from="2" data-dependency-to="3"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.getElementById('chart');
+  let lastXml = '';
+  document.getElementById('export').addEventListener('click', () => {
+    lastXml = chart.ganttApi.getDataAsMsProjectXml();
+    document.getElementById('xml').textContent = lastXml;
+  });
+  document.getElementById('import').addEventListener('click', () => {
+    if (!lastXml) return;
+    chart.ganttApi.setTaskDataFromMsProjectXml(lastXml);
+  });
+</script>
+</body></html>

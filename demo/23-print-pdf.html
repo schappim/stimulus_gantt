@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>23 · print/pdf</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>23 — Print / PDF</h1>
+<p>Calls <code>window.print()</code> with a built-in <code>@media print</code> stylesheet.</p>
+<div class="toolbar"><button id="print">Print</button></div>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-print-mode-value="fit-to-page">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Discovery" data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="Design"    data-task-start="2026-06-08" data-task-end="2026-06-15"></li>
+    <li data-task-id="3" data-task-name="Build"     data-task-start="2026-06-16" data-task-end="2026-06-30"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.getElementById('print').addEventListener('click', () => {
+    document.getElementById('chart').ganttApi.printToPdf();
+  });
+</script>
+</body></html>

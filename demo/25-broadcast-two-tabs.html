@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>25 · broadcast (two tabs)</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>25 — Live broadcast between tabs</h1>
+<p>Open this page in two tabs; drag a bar in one and watch it move in the other.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-editable-value="true"
+     data-gantt-broadcast-value="broadcast-channel"
+     data-gantt-broadcast-channel-value="sg-demo">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Foo" data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="2" data-task-name="Bar" data-task-start="2026-06-06" data-task-end="2026-06-10"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

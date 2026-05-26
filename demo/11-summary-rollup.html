@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>11 · summary rollup</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>11 — Summary tasks (WBS rollup)</h1>
+<p>Nested <code>&lt;ol&gt;</code> children become a hierarchy; parents render as summary bars.</p>
+<div class="chart" data-controller="gantt" data-gantt-view-value="week" data-gantt-wbs-numbering-value="true">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Phase 1">
+      <ol>
+        <li data-task-id="1.1" data-task-name="Research"  data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+        <li data-task-id="1.2" data-task-name="Specify"   data-task-start="2026-06-06" data-task-end="2026-06-12"></li>
+      </ol>
+    </li>
+    <li data-task-id="2" data-task-name="Phase 2">
+      <ol>
+        <li data-task-id="2.1" data-task-name="Build"     data-task-start="2026-06-15" data-task-end="2026-07-05"></li>
+        <li data-task-id="2.2" data-task-name="QA"        data-task-start="2026-07-06" data-task-end="2026-07-13"></li>
+      </ol>
+    </li>
+    <li data-task-id="3" data-task-name="Launch"          data-task-start="2026-07-15" data-task-milestone="true"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>10 · milestones</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>10 — Milestones</h1>
+<p>Zero-duration tasks render as a diamond.</p>
+<div class="chart" data-controller="gantt" data-gantt-view-value="day">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Kickoff"     data-task-start="2026-06-01" data-task-milestone="true"></li>
+    <li data-task-id="2" data-task-name="Design lock" data-task-start="2026-06-15" data-task-milestone="true"></li>
+    <li data-task-id="3" data-task-name="Feature freeze" data-task-start="2026-07-01" data-task-milestone="true"></li>
+    <li data-task-id="4" data-task-name="Launch"      data-task-start="2026-07-15" data-task-milestone="true"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

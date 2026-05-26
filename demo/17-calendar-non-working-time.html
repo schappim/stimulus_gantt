@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>17 · non-working time</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>17 — Non-working days &amp; holidays</h1>
+<p>Weekends are shaded by default; holidays added via <code>data-gantt-holidays-value</code>.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-holidays-value='["2026-06-09","2026-06-10"]'>
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Work" data-task-start="2026-06-01" data-task-end="2026-06-15"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

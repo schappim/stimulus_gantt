@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>04 · drag/move/resize</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>04 — Drag, move, resize</h1>
+<p>Drag the bar body to move; drag the edges to resize. Hold <kbd>Esc</kbd> mid-drag to cancel.</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-editable-value="true"
+     data-gantt-view-value="day"
+     data-gantt-row-height-value="32">
+  <ol class="sg-tasks">
+    <li data-task-id="a" data-task-name="Stage 1" data-task-start="2026-06-01" data-task-end="2026-06-08"></li>
+    <li data-task-id="b" data-task-name="Stage 2" data-task-start="2026-06-09" data-task-end="2026-06-16"></li>
+    <li data-task-id="c" data-task-name="Stage 3" data-task-start="2026-06-17" data-task-end="2026-06-24"></li>
+  </ol>
+</div>
+<div class="log" id="log">drag a bar →</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const log = document.getElementById('log');
+  const chart = document.getElementById('chart');
+  for (const evt of ['taskMoved', 'taskResized']) {
+    chart.addEventListener(`gantt:${evt}`, (e) =>
+      log.textContent = `${evt}: ${JSON.stringify(e.detail, null, 2)}\n` + log.textContent);
+  }
+</script>
+</body></html>

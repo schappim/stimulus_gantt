@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>27 · detail rail</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+<style>
+  .layout { display: grid; grid-template-columns: 1fr 280px; gap: 12px; }
+  .rail { background: #fff; padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px; height: 480px; overflow: auto; }
+</style>
+</head><body>
+<main>
+<h1>27 — Side rail detail panel</h1>
+<p>Selecting a bar updates a separate rail using a host-supplied template.</p>
+<div class="layout">
+  <div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="day">
+    <ol class="sg-tasks">
+      <li data-task-id="1" data-task-name="Design"  data-task-start="2026-06-01" data-task-end="2026-06-08"></li>
+      <li data-task-id="2" data-task-name="Build"   data-task-start="2026-06-09" data-task-end="2026-06-22"></li>
+    </ol>
+  </div>
+  <aside class="rail" data-controller="gantt-detail-panel" data-gantt-detail-panel-target-value="chart"></aside>
+</div>
+<template id="task-detail-tpl">
+  <div>
+    <h3 data-bind="name"></h3>
+    <p>id <span data-bind="id"></span></p>
+    <p>start <span data-bind="start"></span></p>
+    <p>end <span data-bind="end"></span></p>
+  </div>
+</template>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

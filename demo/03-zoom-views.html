@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>03 · zoom views</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>03 — Six zoom levels</h1>
+<p><code>hour</code> → <code>year</code>. Click the buttons or use <kbd>+</kbd> / <kbd>-</kbd>.</p>
+<div class="toolbar">
+  <button data-view="hour">hour</button>
+  <button data-view="day">day</button>
+  <button data-view="week">week</button>
+  <button data-view="month">month</button>
+  <button data-view="quarter">quarter</button>
+  <button data-view="year">year</button>
+</div>
+<div class="chart" id="chart" data-controller="gantt" data-gantt-view-value="week">
+  <ol class="sg-tasks">
+    <li data-task-id="1" data-task-name="Discovery" data-task-start="2026-05-01" data-task-end="2026-05-10"></li>
+    <li data-task-id="2" data-task-name="Design"    data-task-start="2026-05-11" data-task-end="2026-06-05"></li>
+    <li data-task-id="3" data-task-name="Build"     data-task-start="2026-06-06" data-task-end="2026-08-20"></li>
+    <li data-task-id="4" data-task-name="QA"        data-task-start="2026-08-21" data-task-end="2026-09-10"></li>
+    <li data-task-id="5" data-task-name="Launch"    data-task-start="2026-09-15" data-task-milestone="true"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.querySelector('#chart');
+  document.querySelectorAll('[data-view]').forEach((btn) => {
+    btn.addEventListener('click', () => chart.ganttApi.setView(btn.dataset.view));
+  });
+</script>
+</body></html>
