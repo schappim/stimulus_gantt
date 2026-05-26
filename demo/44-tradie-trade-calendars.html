@@ -1,0 +1,51 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>44 · trade calendars</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>44 — Per-trade working calendars</h1>
+<p>Different trades work different hours. The boilermaker is on 6&nbsp;AM–2&nbsp;PM, the subbie sparky is 4&times;10s (Mon&ndash;Thu), the supervisor is 9–5 Mon&ndash;Fri. Non-working time is shaded across the timeline.</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-row-height-value="34"
+     data-gantt-editable-value="true"
+     data-gantt-calendars-value='{
+       "9to5":     {"weekdays":[1,2,3,4,5],"hours":[["09:00","17:00"]]},
+       "early":    {"weekdays":[1,2,3,4,5],"hours":[["06:00","14:00"]]},
+       "4x10":     {"weekdays":[1,2,3,4],  "hours":[["07:00","17:00"]]},
+       "weekend":  {"weekdays":[0,6],      "hours":[["09:00","17:00"]],
+                    "holidays":["2026-06-08","2026-06-09"]}
+     }'
+     data-gantt-calendar-value="9to5"
+     data-gantt-holidays-value='["2026-06-09"]'
+     data-gantt-sidebar-width-value="380"
+     data-gantt-sidebar-columns-value='[
+       {"field":"wbs","header":"#","width":36,"align":"right"},
+       {"field":"name","header":"Task","width":200},
+       {"field":"resources","header":"Trade","width":120}
+     ]'>
+  <ol class="sg-tasks">
+    <li data-task-id="t1" data-task-name="Site supervisor walk"    data-task-start="2026-06-01" data-task-end="2026-06-01" data-task-resource-ids='["super"]'></li>
+    <li data-task-id="t2" data-task-name="Boilermaker — handrails" data-task-start="2026-06-01" data-task-end="2026-06-03" data-task-resource-ids='["boilie"]'></li>
+    <li data-task-id="t3" data-task-name="Sparky — switchboard"    data-task-start="2026-06-02" data-task-end="2026-06-05" data-task-resource-ids='["sparky"]'></li>
+    <li data-task-id="t4" data-task-name="Weekend security install" data-task-start="2026-06-06" data-task-end="2026-06-07" data-task-resource-ids='["weekendsub"]'></li>
+    <li data-task-id="t5" data-task-name="Public holiday (Mon)"    data-task-start="2026-06-08" data-task-milestone="true"></li>
+    <li data-task-id="t6" data-task-name="Sparky — fitoff"         data-task-start="2026-06-10" data-task-end="2026-06-11" data-task-resource-ids='["sparky"]'></li>
+    <li data-task-id="t7" data-task-name="Site supervisor walk"    data-task-start="2026-06-12" data-task-end="2026-06-12" data-task-resource-ids='["super"]'></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.getElementById('chart').addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([
+      { id: 'super',      name: 'Supervisor',  calendar: '9to5',    color: '#0f172a' },
+      { id: 'boilie',     name: 'Boilermaker', calendar: 'early',   color: '#f97316' },
+      { id: 'sparky',     name: 'Sparky',      calendar: '4x10',    color: '#0ea5e9' },
+      { id: 'weekendsub', name: 'Weekend sub', calendar: 'weekend', color: '#10b981' },
+    ]);
+  });
+</script>
+</body></html>

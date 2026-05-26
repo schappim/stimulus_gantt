@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>42 · jobs by tech</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>42 — Service jobs across a crew</h1>
+<p>One week of callouts for a four-person crew (two sparkies + a plumber + an apprentice). Resource histogram below shows who's overloaded.</p>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-row-height-value="34"
+     data-gantt-editable-value="true"
+     data-gantt-bar-renderer-value="resource-stripes"
+     data-gantt-sidebar-width-value="380"
+     data-gantt-sidebar-columns-value='[
+       {"field":"wbs","header":"#","width":36,"align":"right"},
+       {"field":"name","header":"Job","width":210},
+       {"field":"resources","header":"Crew","width":120}
+     ]'>
+  <ol class="sg-tasks">
+    <li data-task-id="j1"  data-task-name="Mrs Patel — leaking hot water service" data-task-start="2026-06-01" data-task-end="2026-06-01" data-task-resource-ids='["plumber","apprentice"]'></li>
+    <li data-task-id="j2"  data-task-name="42 King St — switchboard upgrade"      data-task-start="2026-06-01" data-task-end="2026-06-02" data-task-resource-ids='["sparky1"]'></li>
+    <li data-task-id="j3"  data-task-name="Cafe Lumen — kitchen reno electrics"   data-task-start="2026-06-01" data-task-end="2026-06-04" data-task-resource-ids='["sparky2","apprentice"]'></li>
+    <li data-task-id="j4"  data-task-name="Smith family — gas cooktop"            data-task-start="2026-06-02" data-task-end="2026-06-02" data-task-resource-ids='["plumber"]'></li>
+    <li data-task-id="j5"  data-task-name="Site induction (all hands)"            data-task-start="2026-06-03" data-task-milestone="true" data-task-resource-ids='["sparky1","sparky2","plumber","apprentice"]'></li>
+    <li data-task-id="j6"  data-task-name="Park Ave — bathroom rough plumb"       data-task-start="2026-06-03" data-task-end="2026-06-04" data-task-resource-ids='["plumber"]'></li>
+    <li data-task-id="j7"  data-task-name="Office fit-out — data + power"         data-task-start="2026-06-04" data-task-end="2026-06-08" data-task-resource-ids='["sparky1"]'></li>
+    <li data-task-id="j8"  data-task-name="Apprentice TAFE day"                   data-task-start="2026-06-05" data-task-end="2026-06-05" data-task-resource-ids='["apprentice"]'></li>
+    <li data-task-id="j9"  data-task-name="Suburb West — solar inverter swap"     data-task-start="2026-06-08" data-task-end="2026-06-08" data-task-resource-ids='["sparky2"]'></li>
+    <li data-task-id="j10" data-task-name="Aldi Ringwood — emergency lighting"    data-task-start="2026-06-09" data-task-end="2026-06-10" data-task-resource-ids='["sparky2","apprentice"]'></li>
+    <li data-task-id="j11" data-task-name="Park Ave — bathroom fitoff"            data-task-start="2026-06-09" data-task-end="2026-06-10" data-task-resource-ids='["plumber"]'></li>
+    <li data-task-id="j12" data-task-name="Quote site visits"                     data-task-start="2026-06-11" data-task-end="2026-06-12" data-task-resource-ids='["sparky1"]'></li>
+  </ol>
+</main>
+<div data-controller="gantt-histogram" data-gantt-histogram-target-value="chart" style="margin-top: 12px"></div>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.getElementById('chart').addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([
+      { id: 'sparky1',    name: 'Dave (sparky)',     color: '#0ea5e9', capacity: 1 },
+      { id: 'sparky2',    name: 'Kelly (sparky)',    color: '#10b981', capacity: 1 },
+      { id: 'plumber',    name: 'Trev (plumber)',    color: '#f59e0b', capacity: 1 },
+      { id: 'apprentice', name: 'Jordan (apprentice)', color: '#a855f7', capacity: 1 },
+    ]);
+  });
+</script>
+</body></html>

@@ -58,6 +58,18 @@
   height: 100%;
   min-height: 320px;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Inputs and editors inside the chart should still allow text selection. */
+.sg-root input,
+.sg-root textarea,
+.sg-root [contenteditable="true"],
+.sg-task-editor-popover input,
+.sg-task-editor-popover textarea {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .sg-toolbar {
@@ -69,6 +81,9 @@
   background: var(--sg-bg-alt);
   flex: 0 0 auto;
   min-height: 32px;
+}
+.sg-toolbar:empty {
+  display: none;
 }
 
 .sg-main {
@@ -106,6 +121,16 @@
   overflow-x: hidden;
 }
 
+/* Holds the rows. Has an explicit height (set in JS) and position:
+ * relative so that absolute-positioned rows are anchored here and don't
+ * escape upward to .sg-root. We don't replaceChildren on .sg-sidebar-body
+ * because that would collapse the body's scrollHeight to 0 and reset
+ * scrollTop — replacing on this inner host is safe because the host's
+ * explicit height keeps the body's scrollable extent stable. */
+.sg-sidebar-rows {
+  position: relative;
+}
+
 .sg-sidebar-row {
   display: flex;
   align-items: center;
@@ -113,6 +138,7 @@
   border-bottom: 1px solid var(--sg-border-color);
   gap: 4px;
   padding: 0 4px;
+  background: var(--sg-bg);
 }
 .sg-sidebar-row--header {
   font-weight: 600;
@@ -168,13 +194,20 @@
 }
 
 .sg-timeline-header {
-  position: sticky;
-  top: 0;
+  position: relative;
   height: var(--sg-header-height);
   background: var(--sg-bg-header);
   border-bottom: 1px solid var(--sg-border-color-strong);
   overflow: hidden;
   z-index: 2;
+  flex: 0 0 auto;
+}
+
+/* Inner header wrapper. Same width as the timeline content so the
+ * header's scrollLeft can be driven by the body's scrollLeft. */
+.sg-timeline-header-inner {
+  position: relative;
+  height: 100%;
 }
 
 .sg-header-row {
@@ -194,11 +227,22 @@
   justify-content: center;
   white-space: pre-line;
   line-height: 1.05;
+  flex: 0 0 auto;
+  box-sizing: border-box;
 }
 
 .sg-timeline-body {
   flex: 1 1 auto;
   overflow: auto;
+  position: relative;
+  background: var(--sg-bg);
+}
+
+/* The grid background lives on the inner content div — NOT the body —
+ * so vertical column rules only appear under actual content, never in
+ * the empty area to the right when the body viewport is wider than the
+ * project span. */
+.sg-timeline-content {
   position: relative;
   background:
     linear-gradient(to right, var(--sg-border-color) 0, var(--sg-border-color) 1px, transparent 1px),
@@ -206,7 +250,7 @@
   background-size: var(--sg-column-width) 100%;
 }
 
-.sg-rows, .sg-bars, .sg-nonworking, .sg-arrows {
+.sg-rows, .sg-bars, .sg-nonworking, .sg-arrows, .sg-link-handles {
   position: absolute;
   top: 0;
   left: 0;
@@ -215,6 +259,7 @@
 .sg-rows { z-index: 0; }
 .sg-nonworking { z-index: 1; }
 .sg-bars { z-index: 3; pointer-events: auto; }
+.sg-link-handles { z-index: 5; pointer-events: auto; }
 .sg-arrows { z-index: 4; overflow: visible; }
 
 .sg-row {
@@ -330,16 +375,28 @@
 }
 .sg-bar-handle--start { left: 0; }
 .sg-bar-handle--end { right: 0; }
-.sg-bar-handle--link {
-  right: -10px;
-  width: 12px;
-  height: 12px;
+
+/* Link handle is its own absolutely-positioned element in
+ * .sg-link-handles, NOT a child of .sg-bar (so it can extend past
+ * overflow:hidden and pointer capture isn't routed back to the bar). */
+.sg-link-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #fff;
+  background: #ffffff;
   border: 2px solid var(--sg-bar-color);
-  top: 50%;
-  transform: translateY(-50%);
   cursor: crosshair;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity .12s ease-in-out;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+  z-index: 6;
+}
+.sg-link-handles:hover .sg-link-handle,
+.sg-bars:hover ~ .sg-link-handles .sg-link-handle,
+.sg-timeline-content:hover .sg-link-handle {
+  opacity: 1;
 }
 
 /* Milestones ----------------------------------------------------------- */

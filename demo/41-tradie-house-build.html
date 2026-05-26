@@ -1,0 +1,109 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>41 · house build WBS</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>41 — New-build house (WBS by phase)</h1>
+<p>A typical Australian single-level build broken into phases: <strong>Sitework</strong>, <strong>Slab</strong>, <strong>Frame</strong>, <strong>Lockup</strong>, <strong>Fixout</strong>, <strong>Handover</strong>. Summary bars roll up automatically from their children.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="week"
+     data-gantt-sidebar-width-value="400"
+     data-gantt-wbs-numbering-value="true"
+     data-gantt-critical-path-value="true"
+     data-gantt-sidebar-columns-value='[
+       {"field":"wbs","header":"#","width":48,"align":"right","frozen":true},
+       {"field":"name","header":"Stage","width":200,"frozen":true},
+       {"field":"start","header":"Start","width":92},
+       {"field":"duration","header":"Dur","width":60}
+     ]'>
+  <ol class="sg-tasks">
+    <li data-task-id="site" data-task-name="Sitework">
+      <ol>
+        <li data-task-id="site-clear" data-task-name="Clear &amp; level site"   data-task-start="2026-06-01" data-task-end="2026-06-03"></li>
+        <li data-task-id="site-survey" data-task-name="Set out / survey"        data-task-start="2026-06-04" data-task-end="2026-06-04"></li>
+        <li data-task-id="site-services" data-task-name="Temp power &amp; water" data-task-start="2026-06-05" data-task-end="2026-06-05"></li>
+      </ol>
+    </li>
+    <li data-task-id="slab" data-task-name="Slab">
+      <ol>
+        <li data-task-id="slab-formwork" data-task-name="Formwork"   data-task-start="2026-06-08" data-task-end="2026-06-09"></li>
+        <li data-task-id="slab-plumb-rough" data-task-name="Underslab plumbing" data-task-start="2026-06-10" data-task-end="2026-06-11"></li>
+        <li data-task-id="slab-steel" data-task-name="Steel + mesh" data-task-start="2026-06-12" data-task-end="2026-06-12"></li>
+        <li data-task-id="slab-pour" data-task-name="Pour concrete" data-task-start="2026-06-15" data-task-end="2026-06-15"></li>
+        <li data-task-id="slab-cure" data-task-name="Cure"          data-task-start="2026-06-16" data-task-end="2026-06-19"></li>
+      </ol>
+    </li>
+    <li data-task-id="frame" data-task-name="Frame">
+      <ol>
+        <li data-task-id="frame-walls"  data-task-name="Wall frames" data-task-start="2026-06-22" data-task-end="2026-06-26"></li>
+        <li data-task-id="frame-roof"   data-task-name="Roof trusses" data-task-start="2026-06-29" data-task-end="2026-07-03"></li>
+        <li data-task-id="frame-bricks" data-task-name="Brickwork"   data-task-start="2026-07-06" data-task-end="2026-07-17"></li>
+      </ol>
+    </li>
+    <li data-task-id="lockup" data-task-name="Lockup">
+      <ol>
+        <li data-task-id="lock-roof"     data-task-name="Roof + flashings" data-task-start="2026-07-20" data-task-end="2026-07-24"></li>
+        <li data-task-id="lock-windows"  data-task-name="Windows + doors"  data-task-start="2026-07-27" data-task-end="2026-07-29"></li>
+        <li data-task-id="lock-elec"     data-task-name="Electrical rough" data-task-start="2026-07-30" data-task-end="2026-08-05"></li>
+        <li data-task-id="lock-plumb"    data-task-name="Plumbing rough"   data-task-start="2026-07-30" data-task-end="2026-08-05"></li>
+        <li data-task-id="lock-hvac"     data-task-name="HVAC rough"       data-task-start="2026-08-03" data-task-end="2026-08-07"></li>
+        <li data-task-id="lock-insulate" data-task-name="Insulation"       data-task-start="2026-08-10" data-task-end="2026-08-11"></li>
+      </ol>
+    </li>
+    <li data-task-id="fixout" data-task-name="Fixout">
+      <ol>
+        <li data-task-id="fix-plaster"   data-task-name="Plaster + cornice" data-task-start="2026-08-12" data-task-end="2026-08-19"></li>
+        <li data-task-id="fix-paint-int" data-task-name="Internal paint"    data-task-start="2026-08-20" data-task-end="2026-08-26"></li>
+        <li data-task-id="fix-tile"      data-task-name="Wet area tile"     data-task-start="2026-08-24" data-task-end="2026-08-31"></li>
+        <li data-task-id="fix-kitchen"   data-task-name="Kitchen install"   data-task-start="2026-09-01" data-task-end="2026-09-04"></li>
+        <li data-task-id="fix-floors"    data-task-name="Timber floors"     data-task-start="2026-09-07" data-task-end="2026-09-11"></li>
+        <li data-task-id="fix-elec"      data-task-name="Electrical fixout" data-task-start="2026-09-14" data-task-end="2026-09-16"></li>
+        <li data-task-id="fix-plumb"     data-task-name="Plumbing fixout"   data-task-start="2026-09-14" data-task-end="2026-09-16"></li>
+      </ol>
+    </li>
+    <li data-task-id="handover" data-task-name="Handover">
+      <ol>
+        <li data-task-id="ho-defects" data-task-name="Defect walk + fix" data-task-start="2026-09-17" data-task-end="2026-09-22"></li>
+        <li data-task-id="ho-clean"   data-task-name="Builders clean"    data-task-start="2026-09-23" data-task-end="2026-09-23"></li>
+        <li data-task-id="ho-pci"     data-task-name="PCI / handover"    data-task-start="2026-09-24" data-task-milestone="true"></li>
+      </ol>
+    </li>
+  </ol>
+  <ol class="sg-dependencies" hidden>
+    <li data-dependency-from="site-clear" data-dependency-to="site-survey"></li>
+    <li data-dependency-from="site-survey" data-dependency-to="site-services"></li>
+    <li data-dependency-from="site-services" data-dependency-to="slab-formwork"></li>
+    <li data-dependency-from="slab-formwork" data-dependency-to="slab-plumb-rough"></li>
+    <li data-dependency-from="slab-plumb-rough" data-dependency-to="slab-steel"></li>
+    <li data-dependency-from="slab-steel" data-dependency-to="slab-pour"></li>
+    <li data-dependency-from="slab-pour" data-dependency-to="slab-cure"></li>
+    <li data-dependency-from="slab-cure" data-dependency-to="frame-walls"></li>
+    <li data-dependency-from="frame-walls" data-dependency-to="frame-roof"></li>
+    <li data-dependency-from="frame-roof" data-dependency-to="frame-bricks"></li>
+    <li data-dependency-from="frame-bricks" data-dependency-to="lock-roof"></li>
+    <li data-dependency-from="lock-roof" data-dependency-to="lock-windows"></li>
+    <li data-dependency-from="lock-windows" data-dependency-to="lock-elec"></li>
+    <li data-dependency-from="lock-windows" data-dependency-to="lock-plumb"></li>
+    <li data-dependency-from="lock-elec" data-dependency-to="lock-insulate"></li>
+    <li data-dependency-from="lock-plumb" data-dependency-to="lock-insulate"></li>
+    <li data-dependency-from="lock-hvac" data-dependency-to="lock-insulate"></li>
+    <li data-dependency-from="lock-insulate" data-dependency-to="fix-plaster"></li>
+    <li data-dependency-from="fix-plaster" data-dependency-to="fix-paint-int"></li>
+    <li data-dependency-from="fix-paint-int" data-dependency-to="fix-tile"></li>
+    <li data-dependency-from="fix-tile" data-dependency-to="fix-kitchen"></li>
+    <li data-dependency-from="fix-kitchen" data-dependency-to="fix-floors"></li>
+    <li data-dependency-from="fix-floors" data-dependency-to="fix-elec"></li>
+    <li data-dependency-from="fix-floors" data-dependency-to="fix-plumb"></li>
+    <li data-dependency-from="fix-elec" data-dependency-to="ho-defects"></li>
+    <li data-dependency-from="fix-plumb" data-dependency-to="ho-defects"></li>
+    <li data-dependency-from="ho-defects" data-dependency-to="ho-clean"></li>
+    <li data-dependency-from="ho-clean" data-dependency-to="ho-pci"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

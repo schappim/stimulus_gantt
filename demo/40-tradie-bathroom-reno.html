@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>40 · bathroom reno</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>40 — Bathroom renovation (sequential trades)</h1>
+<p>The classic single-bathroom job: demo → rough plumbing → rough electrical → waterproof → tile → fixout → final clean. Each trade waits on the one before. Critical path is on by default — the whole plan is critical because every task is sequential.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-row-height-value="32"
+     data-gantt-editable-value="true"
+     data-gantt-critical-path-value="true"
+     data-gantt-wbs-numbering-value="true">
+  <ol class="sg-tasks">
+    <li data-task-id="demo"      data-task-name="Strip out / demo"      data-task-start="2026-06-01" data-task-end="2026-06-02"></li>
+    <li data-task-id="rough-plumb" data-task-name="Rough-in plumbing"  data-task-start="2026-06-03" data-task-end="2026-06-04"></li>
+    <li data-task-id="rough-elec"  data-task-name="Rough-in electrical" data-task-start="2026-06-04" data-task-end="2026-06-05"></li>
+    <li data-task-id="frame"     data-task-name="Frame / blockouts"    data-task-start="2026-06-08" data-task-end="2026-06-09"></li>
+    <li data-task-id="waterproof" data-task-name="Waterproof + cure"    data-task-start="2026-06-10" data-task-end="2026-06-12"></li>
+    <li data-task-id="screed"    data-task-name="Screed shower base"   data-task-start="2026-06-15" data-task-end="2026-06-15"></li>
+    <li data-task-id="tile"      data-task-name="Wall + floor tiling"  data-task-start="2026-06-16" data-task-end="2026-06-19"></li>
+    <li data-task-id="grout"     data-task-name="Grout + seal"         data-task-start="2026-06-22" data-task-end="2026-06-22"></li>
+    <li data-task-id="vanity"    data-task-name="Install vanity + mirror"     data-task-start="2026-06-23" data-task-end="2026-06-23"></li>
+    <li data-task-id="fixout-plumb" data-task-name="Plumbing fixout (tapware)" data-task-start="2026-06-24" data-task-end="2026-06-24"></li>
+    <li data-task-id="fixout-elec"  data-task-name="Electrical fixout (lights, fan)" data-task-start="2026-06-24" data-task-end="2026-06-25"></li>
+    <li data-task-id="silicone"  data-task-name="Silicone / glass"     data-task-start="2026-06-26" data-task-end="2026-06-26"></li>
+    <li data-task-id="clean"     data-task-name="Final clean + handover" data-task-start="2026-06-29" data-task-milestone="true"></li>
+  </ol>
+  <ol class="sg-dependencies" hidden>
+    <li data-dependency-from="demo"       data-dependency-to="rough-plumb"></li>
+    <li data-dependency-from="rough-plumb" data-dependency-to="rough-elec" data-dependency-type="SS" data-dependency-lag="1d"></li>
+    <li data-dependency-from="rough-elec" data-dependency-to="frame"></li>
+    <li data-dependency-from="frame"      data-dependency-to="waterproof"></li>
+    <li data-dependency-from="waterproof" data-dependency-to="screed"      data-dependency-lag="1d"></li>
+    <li data-dependency-from="screed"     data-dependency-to="tile"></li>
+    <li data-dependency-from="tile"       data-dependency-to="grout"></li>
+    <li data-dependency-from="grout"      data-dependency-to="vanity"></li>
+    <li data-dependency-from="vanity"     data-dependency-to="fixout-plumb"></li>
+    <li data-dependency-from="fixout-plumb" data-dependency-to="fixout-elec" data-dependency-type="SS"></li>
+    <li data-dependency-from="fixout-elec" data-dependency-to="silicone"></li>
+    <li data-dependency-from="silicone"   data-dependency-to="clean"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+</script>
+</body></html>

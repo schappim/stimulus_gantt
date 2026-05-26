@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>43 · multi-site builder</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>43 — Builder with three concurrent jobs</h1>
+<p>Three sites running side-by-side. Group-by lets you switch between "by site" (default) and "by trade" so you can see who's stretched.</p>
+<div class="toolbar">
+  <button data-group="">flat</button>
+  <button data-group="site">by site</button>
+  <button data-group="trade">by trade</button>
+</div>
+<div class="chart" id="chart" data-controller="gantt"
+     data-gantt-view-value="day"
+     data-gantt-row-height-value="32"
+     data-gantt-editable-value="true"
+     data-gantt-critical-path-value="true">
+  <ol class="sg-tasks">
+    <li data-task-id="a-frame"     data-task-name="44 Oak — Frame"      data-task-start="2026-06-01" data-task-end="2026-06-05"></li>
+    <li data-task-id="a-lockup"    data-task-name="44 Oak — Lockup"     data-task-start="2026-06-08" data-task-end="2026-06-12"></li>
+    <li data-task-id="a-fixout"    data-task-name="44 Oak — Fixout"     data-task-start="2026-06-15" data-task-end="2026-06-22"></li>
+    <li data-task-id="b-slab"      data-task-name="12 Elm — Slab pour"  data-task-start="2026-06-02" data-task-end="2026-06-02"></li>
+    <li data-task-id="b-frame"     data-task-name="12 Elm — Frame"      data-task-start="2026-06-08" data-task-end="2026-06-12"></li>
+    <li data-task-id="b-lockup"    data-task-name="12 Elm — Lockup"     data-task-start="2026-06-15" data-task-end="2026-06-19"></li>
+    <li data-task-id="c-handover"  data-task-name="7 Pine — Handover"   data-task-start="2026-06-03" data-task-milestone="true"></li>
+    <li data-task-id="c-defects"   data-task-name="7 Pine — Defect fix" data-task-start="2026-06-04" data-task-end="2026-06-09"></li>
+    <li data-task-id="c-clean"     data-task-name="7 Pine — Builders clean" data-task-start="2026-06-10" data-task-end="2026-06-10"></li>
+  </ol>
+  <ol class="sg-dependencies" hidden>
+    <li data-dependency-from="a-frame"   data-dependency-to="a-lockup"></li>
+    <li data-dependency-from="a-lockup"  data-dependency-to="a-fixout"></li>
+    <li data-dependency-from="b-slab"    data-dependency-to="b-frame"></li>
+    <li data-dependency-from="b-frame"   data-dependency-to="b-lockup"></li>
+    <li data-dependency-from="c-handover" data-dependency-to="c-defects"></li>
+    <li data-dependency-from="c-defects"  data-dependency-to="c-clean"></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  const chart = document.getElementById('chart');
+  document.querySelectorAll('[data-group]').forEach((b) => {
+    b.addEventListener('click', () => chart.ganttApi.setGroupBy(b.dataset.group || null));
+  });
+</script>
+</body></html>

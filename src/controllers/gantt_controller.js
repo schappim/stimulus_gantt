@@ -17,12 +17,9 @@ import { resolveAdapter, BroadcastBus } from '../lib/broadcast/index.js';
 import { parseJsonAttr, throttleRaf, debounce, clamp } from '../lib/utils.js';
 
 const DEFAULT_SIDEBAR_COLUMNS = [
-  { field: 'wbs',   header: '#',     width: 48,  align: 'right',  frozen: true },
-  { field: 'name',  header: 'Task',  width: 240, frozen: true },
-  { field: 'start', header: 'Start', width: 96 },
-  { field: 'end',   header: 'End',   width: 96 },
-  { field: 'duration', header: 'Duration', width: 80 },
-  { field: 'progress', header: 'Progress', width: 80 },
+  { field: 'wbs',  header: '#',    width: 32, align: 'right', frozen: true },
+  { field: 'name', header: 'Task', width: 220, frozen: true },
+  { field: 'duration', header: 'Duration', width: 72 },
 ];
 
 const PERSISTABLE_KEYS = [
@@ -45,7 +42,7 @@ export default class GanttController extends Controller {
     columnWidth:       Number,
     rowHeight:         { type: Number, default: 32 },
     headerHeight:      { type: Number, default: 48 },
-    sidebarWidth:      { type: Number, default: 320 },
+    sidebarWidth:      { type: Number, default: 328 },
     sidebarColumns:    { type: Array, default: [] },
     sidebarCollapsed:  { type: Boolean, default: false },
     firstDay:          { type: Number, default: 1 },
@@ -162,19 +159,52 @@ export default class GanttController extends Controller {
     this._sidebar = el('div', { class: 'sg-sidebar', 'data-sg-role': 'sidebar' });
     this._sidebarHeader = el('div', { class: 'sg-sidebar-header' });
     this._sidebarBody = el('div', { class: 'sg-sidebar-body' });
+    // Inner sidebar wrapper: holds the rows, has an explicit height. We
+    // never replace children on _sidebarBody itself — that would collapse
+    // its scrollHeight to 0 momentarily and snap scrollTop to 0 (which
+    // breaks vertical sync with the virtualised timeline). Position
+    // relative so child rows (position: absolute) are anchored HERE,
+    // not at the .sg-root that is the next positioned ancestor.
+    this._sidebarRowsHost = el('div', {
+      class: 'sg-sidebar-rows',
+      style: { position: 'relative' },
+    });
     this._timeline = el('div', { class: 'sg-timeline', 'data-sg-role': 'timeline' });
     this._timelineHeader = el('div', { class: 'sg-timeline-header' });
+    this._timelineHeaderInner = el('div', { class: 'sg-timeline-header-inner' });
     this._timelineBody = el('div', { class: 'sg-timeline-body' });
+    // Inner content wrapper inside the body. Owns the column-grid
+    // background and an explicit width so it can be wider than the
+    // viewport (horizontal scroll) or auto-extend to fill the viewport
+    // (when the project span is shorter than the visible width).
+    // Position relative so the absolute bars/rows layers anchor here.
+    this._timelineContent = el('div', {
+      class: 'sg-timeline-content',
+      style: { position: 'relative' },
+    });
     this._barsLayer = el('div', { class: 'sg-bars' });
     this._rowsLayer = el('div', { class: 'sg-rows' });
     this._nonWorkingLayer = el('div', { class: 'sg-nonworking' });
     this._arrowsLayer = svg('svg', { class: 'sg-arrows', xmlns: 'http://www.w3.org/2000/svg' });
+    this._linkHandleLayer = el('div', { class: 'sg-link-handles' });
     this._nowLine = el('div', { class: 'sg-now-indicator' });
     this._dragGhost = el('div', { class: 'sg-drag-ghost', hidden: true });
     this._tooltip = el('div', { class: 'sg-tooltip', hidden: true });
 
+    this._sidebarBody.append(this._sidebarRowsHost);
     this._sidebar.append(this._sidebarHeader, this._sidebarBody);
-    this._timelineBody.append(this._nonWorkingLayer, this._rowsLayer, this._barsLayer, this._arrowsLayer, this._nowLine, this._dragGhost, this._tooltip);
+    this._timelineContent.append(
+      this._nonWorkingLayer,
+      this._rowsLayer,
+      this._barsLayer,
+      this._linkHandleLayer,
+      this._arrowsLayer,
+      this._nowLine,
+      this._dragGhost,
+      this._tooltip,
+    );
+    this._timelineBody.append(this._timelineContent);
+    this._timelineHeader.append(this._timelineHeaderInner);
     this._timeline.append(this._timelineHeader, this._timelineBody);
     this._main.append(this._sidebar, this._timeline);
     this._root.append(this._toolbar, this._main);
@@ -186,6 +216,14 @@ export default class GanttController extends Controller {
     this.element.append(this._root);
     this._installScrollSync();
     this._installPointerEvents();
+    this._installResizeObserver();
+  }
+
+  _installResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') return;
+    this._resizeObserver = new ResizeObserver(() => this._rerender());
+    this._resizeObserver.observe(this._timelineBody);
+    this._teardowns.push(() => this._resizeObserver?.disconnect());
   }
 
   _readHtmlSources() {
@@ -531,24 +569,31 @@ export default class GanttController extends Controller {
       };
     }
     const range = this._projectRange();
-    if (range.start && range.end) {
-      const view = getView(this.viewName);
-      const padded = {
-        start: view.startOfRange(range.start),
-        end: view.endOfRange(range.end),
-      };
-      // Pad to at least 8 cells.
-      while (view.columnsBetween(padded.start, padded.end) < 8) {
-        padded.end = view.addSlots(padded.end, 1);
-      }
-      return padded;
-    }
-    const anchor = this.hasDateValue && this.dateValue
-      ? parseDate(this.dateValue)
-      : new Date();
     const view = getView(this.viewName);
-    const start = view.startOfRange(anchor);
-    let end = view.addSlots(start, 12);
+    let start;
+    let end;
+    if (range.start && range.end) {
+      start = view.startOfRange(range.start);
+      end = view.endOfRange(range.end);
+      // Pad to at least 8 cells.
+      while (view.columnsBetween(start, end) < 8) {
+        end = view.addSlots(end, 1);
+      }
+    } else {
+      const anchor = this.hasDateValue && this.dateValue
+        ? parseDate(this.dateValue)
+        : new Date();
+      start = view.startOfRange(anchor);
+      end = view.addSlots(start, 12);
+    }
+    // Extend to fill the viewport so the chart doesn't look orphaned
+    // when the project span is shorter than the available width.
+    const vw = this._timelineBody?.clientWidth || 0;
+    if (vw > 0 && this.columnWidth > 0) {
+      const cur = view.columnsBetween(start, end);
+      const want = Math.floor(vw / this.columnWidth);
+      if (want > cur) end = view.addSlots(end, want - cur);
+    }
     return { start, end };
   }
 
@@ -588,12 +633,15 @@ export default class GanttController extends Controller {
     const view = getView(this.viewName);
     const columns = view.columnsBetween(range.start, range.end);
 
-    // Resize layers.
+    // Resize layers. The content wrapper takes the FINAL width; layers
+    // fill that. The header inner matches so it scrolls in sync.
     const contentWidth = columns * this.columnWidth;
-    this._timelineHeader.style.width = `${contentWidth}px`;
+    this._timelineContent.style.width = `${contentWidth}px`;
+    this._timelineHeaderInner.style.width = `${contentWidth}px`;
     this._barsLayer.style.width = `${contentWidth}px`;
     this._rowsLayer.style.width = `${contentWidth}px`;
     this._nonWorkingLayer.style.width = `${contentWidth}px`;
+    this._linkHandleLayer.style.width = `${contentWidth}px`;
     this._arrowsLayer.setAttribute('width', contentWidth);
     this._arrowsLayer.style.width = `${contentWidth}px`;
 
@@ -620,7 +668,7 @@ export default class GanttController extends Controller {
 
   _renderHeader(view, range, columns) {
     const head = view.buildHeader(range.start, range.end);
-    this._timelineHeader.replaceChildren();
+    this._timelineHeaderInner.replaceChildren();
     for (const tier of head.tiers) {
       const row = el('div', { class: `sg-header-row ${tier.className || ''}` });
       for (const cell of tier.cells) {
@@ -635,7 +683,7 @@ export default class GanttController extends Controller {
         }
         row.appendChild(c);
       }
-      this._timelineHeader.appendChild(row);
+      this._timelineHeaderInner.appendChild(row);
     }
     this._timelineHeader.style.height = `${this.headerHeightValue}px`;
     setCssVar(this._root, '--sg-tier-count', String(head.tiers.length));
@@ -697,10 +745,18 @@ export default class GanttController extends Controller {
   _renderRowsAndBars(view, range) {
     const { tasks, index } = this._visibleTasks();
     const totalHeight = tasks.length * this.rowHeightValue;
-    this._sidebarBody.style.minHeight = `${totalHeight}px`;
+    // Explicit heights on the host containers. Critical: setting an
+    // explicit height on _sidebarRowsHost (not on _sidebarBody) means we
+    // can replaceChildren on the host without collapsing the body's
+    // scrollHeight to 0 — which would snap scrollTop to 0 and break the
+    // virtualised sidebar (the sidebar would scroll back to the top on
+    // every render).
+    this._sidebarRowsHost.style.height = `${totalHeight}px`;
+    this._timelineContent.style.height = `${totalHeight}px`;
     this._barsLayer.style.height = `${totalHeight}px`;
     this._rowsLayer.style.height = `${totalHeight}px`;
     this._nonWorkingLayer.style.height = `${totalHeight}px`;
+    this._linkHandleLayer.style.height = `${totalHeight}px`;
     this._arrowsLayer.setAttribute('height', totalHeight);
     this._arrowsLayer.style.height = `${totalHeight}px`;
 
@@ -713,18 +769,13 @@ export default class GanttController extends Controller {
       ? rowWindow({ count: tasks.length, rowHeight: this.rowHeightValue, scrollTop, viewport })
       : { startIndex: 0, endIndex: tasks.length, paddingTop: 0, paddingBottom: 0 };
 
-    // Sidebar body.
-    this._sidebarBody.replaceChildren();
-    if (rowWin.paddingTop) {
-      this._sidebarBody.appendChild(el('div', { style: { height: `${rowWin.paddingTop}px` } }));
-    }
-
-    // Bars layer + rows layer.
+    // Clear and re-render the visible window. All rows are absolutely
+    // positioned inside their host (which has explicit height) so
+    // scrollTop survives the wipe.
+    this._sidebarRowsHost.replaceChildren();
     this._barsLayer.replaceChildren();
     this._rowsLayer.replaceChildren();
-    if (rowWin.paddingTop) {
-      this._rowsLayer.appendChild(el('div', { style: { position: 'absolute', top: '0', height: `${rowWin.paddingTop}px`, width: '100%' } }));
-    }
+    this._linkHandleLayer.replaceChildren();
 
     this._taskRowEls = new Map();
     this._taskBarEls = new Map();
@@ -733,11 +784,18 @@ export default class GanttController extends Controller {
       const t = tasks[i];
       if (!t) continue;
       const wbsNumber = (t.path || []).join('.');
-      // Sidebar row.
+      // Sidebar row — absolute-positioned at i * rowHeight.
       const sRow = el('div', {
         class: `sg-sidebar-row ${t.summary ? 'sg-sidebar-row--summary' : ''} ${t.milestone ? 'sg-sidebar-row--milestone' : ''}`,
         'data-task-id': t.id,
-        style: { paddingLeft: `${(t.depth || 0) * 14}px`, height: `${this.rowHeightValue}px` },
+        style: {
+          position: 'absolute',
+          left: '0',
+          right: '0',
+          top: `${i * this.rowHeightValue}px`,
+          height: `${this.rowHeightValue}px`,
+          paddingLeft: `${(t.depth || 0) * 14}px`,
+        },
       });
       for (const col of this.sidebarColumns) {
         if (col.hidden) continue;
@@ -760,7 +818,7 @@ export default class GanttController extends Controller {
         }
         sRow.appendChild(cell);
       }
-      this._sidebarBody.appendChild(sRow);
+      this._sidebarRowsHost.appendChild(sRow);
       this._taskRowEls.set(t.id, sRow);
 
       // Timeline row.
@@ -777,16 +835,29 @@ export default class GanttController extends Controller {
       if (barNode) {
         this._barsLayer.appendChild(barNode);
         this._taskBarEls.set(t.id, barNode);
+        // Link handle as a sibling, positioned just past the bar's right
+        // edge. Lives in its own layer so it can overflow past the bar
+        // without fighting the bar's overflow: hidden.
+        if (this._isLinkEditable() && !t.locked && !t.milestone) {
+          const left = parseFloat(barNode.style.left) || 0;
+          const width = parseFloat(barNode.style.width) || 0;
+          const top = (parseFloat(barNode.style.top) || 0)
+            + ((parseFloat(barNode.style.height) || this.rowHeightValue) / 2)
+            - 6;
+          const linkHandle = el('div', {
+            class: 'sg-link-handle',
+            'data-task-id': t.id,
+            'data-handle': 'link',
+            style: { left: `${left + width - 2}px`, top: `${top}px` },
+          });
+          this._linkHandleLayer.appendChild(linkHandle);
+        }
       }
       // Baseline.
       if (this.baselineValue !== 'hidden') {
         const baselineNode = this._renderBaseline(t, view, range, i);
         if (baselineNode) this._barsLayer.appendChild(baselineNode);
       }
-    }
-
-    if (rowWin.paddingBottom) {
-      this._sidebarBody.appendChild(el('div', { style: { height: `${rowWin.paddingBottom}px` } }));
     }
   }
 
@@ -901,13 +972,12 @@ export default class GanttController extends Controller {
       height: `${this.rowHeightValue - 8}px`,
     });
 
-    // Resize handles when editable.
+    // Resize handles when editable. The link handle lives in its own
+    // layer (added in _renderRowsAndBars) so it can extend past the bar
+    // without fighting overflow: hidden.
     if (this._isEditable() && !t.locked && !t.milestone) {
       node.appendChild(el('div', { class: 'sg-bar-handle sg-bar-handle--start', 'data-handle': 'start' }));
       node.appendChild(el('div', { class: 'sg-bar-handle sg-bar-handle--end',   'data-handle': 'end' }));
-      if (this._isLinkEditable()) {
-        node.appendChild(el('div', { class: 'sg-bar-handle sg-bar-handle--link',  'data-handle': 'link' }));
-      }
     }
     if (this.store.selection.has(t.id)) node.classList.add('sg-bar--selected');
     return node;
@@ -1010,8 +1080,13 @@ export default class GanttController extends Controller {
   // -------------------- pointer / DnD --------------------
 
   _onTimelinePointerDown(e) {
+    // Link handle lives in its own layer (sibling of the bars layer)
+    // so detect it independently from the bar's interior handles.
+    const linkHandleEl = e.target.closest('.sg-link-handle');
     const handle = e.target.closest('[data-handle]');
-    const bar = e.target.closest('[data-task-id]');
+    const bar = linkHandleEl
+      ? this._taskBarEls?.get(linkHandleEl.dataset.taskId) ?? null
+      : e.target.closest('[data-task-id]');
     if (!bar) {
       // Click on empty timeline — deselect.
       if (!e.shiftKey && !(e.metaKey || e.ctrlKey)) {
@@ -1021,16 +1096,17 @@ export default class GanttController extends Controller {
       }
       return;
     }
-    const taskId = bar.dataset.taskId;
+    const taskId = linkHandleEl?.dataset.taskId ?? bar.dataset.taskId;
     const task = this.store.tasks.find((t) => t.id === taskId);
     if (!task) return;
 
-    if (e.button === 0) {
+    if (e.button === 0 && !linkHandleEl) {
       this.dispatch('taskClicked', { detail: { taskId, task: taskToWireFormat(task), originalEvent: e } });
     }
 
-    // Selection.
-    if (!this.suppressTaskClickSelectionValue) {
+    // Selection — skip when grabbing the link handle (the user wants to
+    // draw a connector, not select).
+    if (!this.suppressTaskClickSelectionValue && !linkHandleEl) {
       if (e.shiftKey && this.taskSelectionValue === 'multiple') {
         const last = this._lastSelected;
         if (last) {
@@ -1057,18 +1133,25 @@ export default class GanttController extends Controller {
     if (e.button !== 0) return;
 
     let mode = 'move';
-    if (handle?.dataset.handle === 'start') mode = 'resize-start';
+    if (linkHandleEl) mode = 'link';
+    else if (handle?.dataset.handle === 'start') mode = 'resize-start';
     else if (handle?.dataset.handle === 'end') mode = 'resize-end';
-    else if (handle?.dataset.handle === 'link') mode = 'link';
+
+    // For link drags, capture on the body so we keep getting move
+    // events even when the cursor leaves the source bar — pointer
+    // capture on the handle would route every event back to the source
+    // and break `elementFromPoint` lookups for drop targets.
+    const captureTarget = mode === 'link' ? this._timelineBody : bar;
 
     this._ensureDragController();
+    e.preventDefault();
     this._drag.begin({
       taskId,
       mode,
       originalEvent: e,
       originStart: task.start,
       originEnd: task.end,
-      target: bar,
+      target: captureTarget,
       pointerId: e.pointerId,
     });
   }
@@ -1140,7 +1223,16 @@ export default class GanttController extends Controller {
     const task = this.store.tasks.find((t) => t.id === state.taskId);
     if (!task) return;
     if (state.mode === 'link') {
-      const target = (state.originalEvent?.target ?? null)?.closest?.('[data-task-id]');
+      // Don't trust originalEvent.target — pointer capture redirects
+      // every event back to the capture target. Resolve the drop from
+      // the cursor coordinates instead.
+      const x = state.originalEvent?.clientX;
+      const y = state.originalEvent?.clientY;
+      let dropEl = null;
+      if (typeof x === 'number' && typeof y === 'number') {
+        dropEl = document.elementFromPoint(x, y);
+      }
+      const target = dropEl?.closest?.('[data-task-id]');
       const targetId = target?.dataset?.taskId;
       if (targetId && targetId !== state.taskId) {
         const before = emit(this.element, 'gantt:beforeDependencyAdd', { from: state.taskId, to: targetId, type: 'FS' });

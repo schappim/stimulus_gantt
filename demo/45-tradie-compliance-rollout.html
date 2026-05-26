@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8" /><title>45 · compliance rollout</title>
+<link rel="stylesheet" href="../dist/stimulus_gantt.css" />
+<link rel="stylesheet" href="./_shared.css" />
+</head><body>
+<main>
+<h1>45 — Compliance &amp; licence rollout</h1>
+<p>Quarterly view of when every team member's tickets are up for renewal: White Card, Working at Heights, Confined Space, EWP, First Aid, Test &amp; Tag. Drag a milestone to defer it; the row label colour shows trade.</p>
+<div class="chart" data-controller="gantt"
+     data-gantt-view-value="month"
+     data-gantt-row-height-value="30"
+     data-gantt-editable-value="true"
+     data-gantt-sidebar-width-value="380"
+     data-gantt-sidebar-columns-value='[
+       {"field":"name","header":"Compliance item","width":240,"frozen":true},
+       {"field":"resources","header":"Person","width":120}
+     ]'>
+  <ol class="sg-tasks">
+    <li data-task-id="ct1"  data-task-name="Dave — White Card refresher"    data-task-start="2026-07-15" data-task-milestone="true" data-task-resource-ids='["dave"]'></li>
+    <li data-task-id="ct2"  data-task-name="Dave — EWP licence renew"       data-task-start="2026-09-01" data-task-milestone="true" data-task-resource-ids='["dave"]'></li>
+    <li data-task-id="ct3"  data-task-name="Kelly — Open electrical licence" data-task-start="2026-08-20" data-task-milestone="true" data-task-resource-ids='["kelly"]'></li>
+    <li data-task-id="ct4"  data-task-name="Kelly — Working at Heights"     data-task-start="2026-11-10" data-task-milestone="true" data-task-resource-ids='["kelly"]'></li>
+    <li data-task-id="ct5"  data-task-name="Trev — Plumbing CoC"            data-task-start="2026-10-05" data-task-milestone="true" data-task-resource-ids='["trev"]'></li>
+    <li data-task-id="ct6"  data-task-name="Trev — Backflow accreditation"  data-task-start="2026-12-12" data-task-milestone="true" data-task-resource-ids='["trev"]'></li>
+    <li data-task-id="ct7"  data-task-name="Jordan — Confined Space"        data-task-start="2026-09-30" data-task-milestone="true" data-task-resource-ids='["jordan"]'></li>
+    <li data-task-id="ct8"  data-task-name="Jordan — First Aid"             data-task-start="2026-11-25" data-task-milestone="true" data-task-resource-ids='["jordan"]'></li>
+    <li data-task-id="ct9"  data-task-name="Whole crew — Test &amp; Tag day"     data-task-start="2026-08-12" data-task-milestone="true" data-task-resource-ids='["dave","kelly","trev","jordan"]'></li>
+    <li data-task-id="ct10" data-task-name="Whole crew — SWMS review"       data-task-start="2026-10-22" data-task-milestone="true" data-task-resource-ids='["dave","kelly","trev","jordan"]'></li>
+  </ol>
+</div>
+</main>
+<script type="module">
+  import StimulusGantt from '../src/index.js';
+  StimulusGantt.start();
+  document.querySelector('[data-controller="gantt"]').addEventListener('gantt:ready', (e) => {
+    e.detail.api.setResourceData([
+      { id: 'dave',   name: 'Dave',   color: '#0ea5e9' },
+      { id: 'kelly',  name: 'Kelly',  color: '#10b981' },
+      { id: 'trev',   name: 'Trev',   color: '#f59e0b' },
+      { id: 'jordan', name: 'Jordan', color: '#a855f7' },
+    ]);
+  });
+</script>
+</body></html>
