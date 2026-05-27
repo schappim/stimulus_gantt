@@ -99,14 +99,139 @@ the existing files rather than inventing new layout each time.
       `npm run build:lib` on every push / PR (Node 20). Ruby matrix
       lands when `gem/demo` does.
 
-## Phase 1 — HTML contract & basic render (done)
+## Phase 1 — HTML contract & dataset hydration
 
-- [x] `<ol class="sg-tasks">` parsing (flat + nested)
+The contract: a server-rendered `<ol class="sg-tasks">` (+ optional
+`<ol class="sg-dependencies">`) is the source of truth. Hydration on
+`connect` parses every documented `data-*` attribute into the
+controller's store. Each box below is one attribute or behaviour from
+`REQUIREMENTS.md §3-§6`.
+
+### 1a — Roots & parsing
+
+- [x] `<ol class="sg-tasks">` parsing (flat list)
+- [x] `<ol class="sg-tasks">` parsing (nested `<ol>` children)
 - [x] `<ol class="sg-dependencies">` parsing
-- [x] Stimulus values for every documented attribute
-- [x] Sidebar + timeline DOM scaffolding
+- [x] Sidebar + timeline DOM scaffolding (`.sg-sidebar`, `.sg-timeline`,
+      `.sg-bars`, `.sg-arrows` SVG overlay)
+- [x] Default bar renderer + default label renderer
 - [x] Day-view header + day-cell shading
-- [x] Default bar renderer + label renderer
+
+### 1b — Gantt root attributes (`data-gantt-*-value`)
+
+- [x] `task-source` (URL fetch on connect)
+- [x] `dependency-source`
+- [x] `resource-source`
+- [x] `view`
+- [x] `views` (per-view overrides)
+- [x] `date` (anchor)
+- [x] `range-start` / `range-end` (forced window)
+- [x] `auto-fit-range` (`tasks` / `viewport` / `false`)
+- [x] `column-width`
+- [x] `row-height`
+- [x] `header-height`
+- [x] `sidebar-width`
+- [x] `sidebar-columns` (JSON column defs)
+- [x] `sidebar-collapsed`
+- [x] `first-day`
+- [x] `non-working-days`
+- [x] `holidays`
+- [x] `working-hours`
+- [x] `calendar` (project-wide id)
+- [x] `calendars` (registry)
+- [x] `time-zone`
+- [x] `locale`
+- [x] `today` (test override)
+- [x] `now-indicator`
+- [x] `task-selection` (`""` / `single` / `multiple`)
+- [x] `task-multi-select-with-click`
+- [x] `suppress-task-click-selection`
+- [x] `editable` (master switch)
+- [x] `task-start-editable`
+- [x] `task-duration-editable`
+- [x] `task-progress-editable`
+- [x] `task-link-editable`
+- [x] `snap-duration`
+- [x] `auto-schedule`
+- [x] `auto-schedule-strategy` (`forward` / `both` / `strict`)
+- [x] `critical-path`
+- [x] `baseline` (`hidden` / `overlay` / `compare`)
+- [x] `baseline-id`
+- [x] `progress-display` (`bar` / `label` / `both` / `none`)
+- [x] `dependency-routing` (`orthogonal` / `smooth` / `straight`)
+- [x] `dependency-color`
+- [x] `summary-rollup`
+- [x] `row-virtualization` / `row-virtual-threshold`
+- [x] `column-virtualization`
+- [x] `wbs-numbering`
+- [x] `quick-filter`
+- [x] `read-only`
+- [x] `persist-key`
+- [x] `add-task` (sidebar "+ Add task" affordance)
+- [x] `add-dependency-affordance`
+- [x] `broadcast` / `broadcast-channel` / `broadcast-filter`
+- [ ] `print-mode` (`fit-to-page` / `actual-size`) — wired into the
+      stylesheet but not yet swapped at runtime by the controller
+- [ ] `accept-files` (drag-to-attach) — option declared, file-drop
+      handler deferred
+
+### 1c — Task attributes (`data-task-*`)
+
+- [x] `id`
+- [x] `parent-id` (flat-list alternative to nested `<ol>`)
+- [x] `name`
+- [x] `start`
+- [x] `end`
+- [x] `duration` (when `end` absent)
+- [x] `effort` (person-hours)
+- [x] `progress`
+- [x] `actual-start` / `actual-end`
+- [x] `milestone`
+- [x] `summary`
+- [x] `collapsed`
+- [x] `locked`
+- [x] `color`
+- [x] `text-color`
+- [x] `class-names`
+- [x] `constraint-type` (all 8 values from REQUIREMENTS §4)
+- [x] `constraint-date`
+- [x] `calendar-id`
+- [x] `resource-ids` (JSON array)
+- [x] `cost`
+- [x] `budgeted-cost`
+- [x] `priority`
+- [x] `renderer` (label override)
+- [x] `bar-renderer` (bar override)
+- [x] `json` (single payload escape hatch)
+- [x] Synthetic-row exclusion from `getTaskData()` /
+      persistence (`data-synthetic="true"`)
+
+### 1d — Dependency attributes (`data-dependency-*`)
+
+- [x] `id`
+- [x] `from` (predecessor)
+- [x] `to` (successor)
+- [x] `type` (`FS` / `SS` / `FF` / `SF`)
+- [x] `lag` (positive lag / negative lead)
+- [x] `color`
+- [x] `class-names`
+- [x] `hard` (delete-protect)
+
+### 1e — Imperative load paths
+
+- [x] `setTaskData([...])`
+- [x] `setDependencyData([...])`
+- [x] `setResourceData([...])`
+- [x] `setBaselineData([...])`
+- [x] `applyTransaction({ add, update, remove })`
+
+### 1f — Boot lifecycle
+
+- [x] `gantt:ready` fires once with `{ api }`
+- [x] `element.ganttApi` exposed after ready
+- [x] HTML wins over JS: server-rendered task wins over
+      `setTaskData(...)` called before `gantt:ready`
+- [x] Disconnect tears down listeners + persisted writes flushed
 
 ## Phase 2 — Six views (done)
 
