@@ -1,14 +1,103 @@
 # stimulus_gantt — Build plan
 
-Checklist per feature; tick as you go. Mirrors `REQUIREMENTS.md §24`
-acceptance criteria.
+A per-feature coverage checklist. Each box maps to a single attribute,
+method, event, renderer, adapter, controller, demo or doc page in
+`REQUIREMENTS.md`. The goal is bisectable progress: every checked box
+should correspond to an isolated, reviewable commit that landed:
 
-## Phase 0 — Scaffolding (done)
+- the code (controller / lib / view / engine file),
+- a Vitest spec under `test/` (and, for Rails-visible surfaces, a
+  Minitest under `gem/demo/test/`),
+- a demo page or screenshot exercising the feature,
+- a matching docs paragraph in `README.md`, `docs/REFERENCE.md` and
+  the relevant `skills/*/SKILL.md`.
 
-- [x] `package.json`, `vite.config.js`, `vite.lib.config.js`, `vitest.config.js`
-- [x] `.gitignore`, `LICENSE`
-- [x] `src/index.js` public surface
-- [x] First green Vitest run
+## Rules of engagement
+
+- **One commit per unchecked box.** Granularity is per individual
+  attribute, method or feature — small, reviewable, bisectable.
+- **Tests run on both sides where they apply.**
+  - Pure JS logic → Vitest in `test/` (`npm test`).
+  - JS controllers / DOM behaviour → JSDOM Vitest (`npm test`).
+  - Rails integration → Minitest in `gem/demo/test/` (`cd gem/demo && bin/rails test`).
+  - Any commit that touches the Rails gem OR a JS feature with a
+    Rails-visible surface (tasks, dependencies, broadcasts,
+    optimistic-id flow) MUST land both test types in the same commit.
+- **Every user-visible feature ships a demo and a screenshot.**
+  - JS-only demos under `demo/NN-…html`, linked from `demo/index.html`.
+  - Rails demos under `gem/demo/app/views/…`.
+  - The screenshot lives under `docs/screenshots/sg-<feature>.png` and
+    is referenced from `README.md` and the matching
+    `skills/*/SKILL.md`. Screenshots are captured from the running
+    dev server / Rails app, not faked.
+- **Docs grow with the code.** Every commit that adds or changes a
+  public surface updates the matching section of:
+  - `README.md`
+  - `skills/stimulus-gantt-js/SKILL.md` (JS API for LLMs)
+  - `skills/stimulus-gantt-rails/SKILL.md` (Rails API for LLMs)
+  - `docs/REFERENCE.md` (full programmatic reference)
+- **No "and also fixed X" commits.** If unrelated rot needs cleaning,
+  that's a separate commit.
+- Commit messages: `feat(lib): add CPM scheduler`,
+  `feat(view): week header tiers`, `feat(opt): hiddenDays`,
+  `feat(broadcast): turbo-stream adapter`,
+  `feat(rails): broadcastable concern`, `feat(rails-gem): scaffold engine`,
+  `docs(skill): document hiddenDays`, `chore(screenshot): sg-month`.
+
+## Phase 0 — JS scaffold (done)
+
+- [x] Project skeleton: `package.json`, `vite.config.js`,
+      `vite.lib.config.js`, `vitest.config.js`,
+      `src/{controllers,lib,views,styles}/`, `test/`, `demo/`,
+      `.github/workflows/ci.yml`, `LICENSE`, `.gitignore`, initial
+      `PLAN.md` / `REQUIREMENTS.md`.
+- [x] `src/index.js` — public surface (`StimulusGantt.start`,
+      `StimulusGantt.create`, `StimulusGantt.destroy`).
+- [x] First green Vitest run.
+- [x] Plain `<script>` IIFE build (`dist/stimulus_gantt.js`).
+- [x] ESM build (`dist/stimulus_gantt.esm.js`) with `@hotwired/stimulus`
+      externalised as a peer dep.
+- [x] Stylesheet (`dist/stimulus_gantt.css`) emitted alongside both
+      bundles.
+- [x] `package.json` `exports` / `unpkg` / `jsdelivr` / `files`
+      whitelist verified for npm publish.
+
+## Phase 0a — Documentation, skills, gem skeleton, dummy Rails app
+
+These set up the *structure* before the per-feature commits flow into
+the existing files rather than inventing new layout each time.
+
+- [x] `README.md` — mirrors stimulus_calendar: badges, hero image,
+      install (Option A IIFE / Option B npm / Option C Rails gem),
+      quick start with **runnable from-the-repo** instructions,
+      screenshot section, attribute tables (filled per-phase), events
+      list, public API, Rails section, demos, build, tests, license.
+- [x] `REQUIREMENTS.md` — public spec; this PLAN.md mirrors §24.
+- [x] `DESIGN.md` — module map + render pipeline.
+- [x] `RAILS.md` — Hotwire-Native build checklist for hosts wiring up
+      the gem.
+- [x] `CHANGELOG.md` — Keep-a-Changelog skeleton.
+- [x] `docs/screenshots/` — directory exists from day one so
+      per-feature screenshots can drop in without scaffolding noise.
+- [x] `skills/stimulus-gantt-js/SKILL.md` — frontmatter + section
+      outline (setup, minimal Gantt, attributes, events, API,
+      gotchas). Content fills in per-feature.
+- [x] `skills/stimulus-gantt-rails/SKILL.md` — frontmatter + section
+      outline (setup, declaring a `Gantt`, `Broadcastable`, render
+      partial, custom Turbo Stream actions, gotchas).
+- [x] `gem/stimulus_gantt_rails/` — bare engine skeleton: `gemspec`,
+      `lib/stimulus_gantt_rails.rb`, `lib/stimulus_gantt_rails/version.rb`,
+      `lib/stimulus_gantt_rails/engine.rb`, `config/importmap.rb`,
+      `config/routes.rb`, empty `app/{assets,controllers,javascript,models,views}/`
+      tree, `MIT-LICENSE`, `Rakefile`, `Gemfile`, `README.md`,
+      `CHANGELOG.md`.
+- [ ] `gem/demo/` — dummy Rails app generated with `rails new`,
+      includes the gem `path:`-pinned, ActionCable + Turbo + Importmap,
+      a `Task`, `Dependency` and `Resource` model with migrations, a
+      tiny `gantts#index` view, and `bin/rails test` wired up.
+- [x] `.github/workflows/ci.yml` — runs `npm ci`, `npm test`,
+      `npm run build:lib` on every push / PR (Node 20). Ruby matrix
+      lands when `gem/demo` does.
 
 ## Phase 1 — HTML contract & basic render (done)
 
