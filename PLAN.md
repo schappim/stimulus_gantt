@@ -371,12 +371,124 @@ machine in `src/lib/dnd.js` and exercised in tests via the
 - [x] Same code path as a real pointer drag — tests assert on the
       mutation pipeline, not synthetic pointer events
 
-## Phase 4 — Dependencies (done)
+## Phase 4 — Dependencies & arrow router
 
-- [x] FS / SS / FF / SF anchor selection
-- [x] Orthogonal / smooth / straight routing
-- [x] Drag-to-create link affordance
-- [x] Delete-on-key
+Arrows live in an SVG overlay (`src/lib/arrows.js`) on top of the
+timeline. Anchor selection comes from the dep's `type`; routing comes
+from the chart's `dependency-routing` option.
+
+### 4a — Dependency types (anchor selection)
+
+- [x] `FS` (finish → start)
+- [x] `SS` (start → start)
+- [x] `FF` (finish → finish)
+- [x] `SF` (start → finish)
+- [x] Lag/lead applied to the target anchor before routing
+- [x] Anchors on summary bars resolve to the rolled-up span
+
+### 4b — Routing modes
+
+- [x] `orthogonal` — right-angled connectors with corner-radius CSS
+      custom property
+- [x] `smooth` — bezier curve
+- [x] `straight` — direct line
+- [x] Self-loops avoided (predecessor === successor refused at parse)
+- [x] Off-screen partner: arrow routes to chart edge with an
+      "off-screen" arrow-head affordance (virtualisation-aware)
+
+### 4c — Drag-to-create
+
+- [x] End-cap affordance per §3c
+- [x] `gantt:beforeDependencyAdd` cancellable
+- [x] Duplicate detection: same `from`/`to`/`type` rejected with
+      no event
+- [x] Cycle detection: new dep that creates a cycle in the DAG fires
+      `gantt:scheduleConflict` and is rejected
+- [x] `addDependency(dep)` API equivalent
+
+### 4d — Delete
+
+- [x] Click an arrow → selected (`gantt-dep-selected` class)
+- [x] `gantt:dependencySelectionChanged` fires
+- [x] Delete / Backspace → fires `gantt:beforeDependencyRemove`
+      cancellable, then `gantt:dependencyRemoved`
+- [x] `data-dependency-hard="true"` refuses the delete
+- [x] `removeDependencyById(id)` API equivalent
+
+### 4e — Styling
+
+- [x] `data-gantt-dependency-color-value` default colour
+- [x] Per-arrow `data-dependency-color` override
+- [x] `data-dependency-class-names` extra classes
+- [x] Hover state highlights endpoints (`data-task-dep-highlight`)
+- [x] Critical-path arrows pick up the critical-rail colour
+
+## Phase 5 — Scheduler (CPM)
+
+`src/lib/schedule.js`. Deterministic, single-pass, idempotent — the
+same project produces the same critical path on every host.
+
+### 5a — Forward pass
+
+- [x] Topological sort of the task DAG
+- [x] Early-start / early-finish per task respecting dep type + lag
+- [x] Calendar-aware date arithmetic (skips non-working time)
+- [x] Constraint enforcement (`mustStartOn`, `mustFinishOn`,
+      `startNoEarlierThan`, `startNoLaterThan`,
+      `finishNoEarlierThan`, `finishNoLaterThan`,
+      `asSoonAsPossible`, `asLateAsPossible`)
+- [x] Constraint conflict → `gantt:scheduleConflict`
+
+### 5b — Backward pass
+
+- [x] Late-finish / late-start per task from project end
+- [x] Total slack = `late_start − early_start`
+- [x] Free slack = min successor's early_start − this task's
+      early_finish − lag
+- [x] Negative slack signals over-constrained network
+
+### 5c — Critical path
+
+- [x] `critical-path` toggle calls `scheduleProject()` on every
+      mutation
+- [x] Tasks with `total_slack <= criticalSlackTolerance` (default
+      `0`) flagged
+- [x] `data-critical="true"` on the bar; red rail in CSS
+- [x] `gantt:criticalPathRecomputed` fires with id list
+
+### 5d — Public surface
+
+- [x] `scheduleProject()`
+- [x] `setCriticalPath(bool)`
+- [x] `getCriticalPathIds()`
+- [x] `getTaskSlack(id)` → `{ total, free, late_start, late_finish }`
+- [x] `setTaskConstraint(id, { type, date })`
+- [x] `reschedule(id, { start, end, duration })`
+- [x] `reflowSuccessors(id)` (internal — exposed for tests)
+- [x] Test fixture from a published reference plan (Bryntum sample)
+
+## Phase 6 — Baselines
+
+`src/lib/model.js` stores `baselines: Map<id, { id, name,
+capturedAt, tasks: [{ id, start, end, progress }] }>` separately from
+the live tasks.
+
+- [x] `captureBaseline({ id, name })` — snapshot current plan
+- [x] `setActiveBaseline(id)` — switch which baseline is rendered
+- [x] `clearBaseline(id)` — remove a baseline
+- [x] `getBaselineData()` / `setBaselineData(bs)` round-trip
+- [x] Multiple baselines coexist
+- [x] `baseline="hidden"` (default — no rendering, data still kept)
+- [x] `baseline="overlay"` — translucent grey bar above each current
+      bar
+- [x] `baseline="compare"` — rows split horizontally (baseline above,
+      current below)
+- [x] `baseline-id` chooses which captured snapshot is active
+- [x] `gantt:baselineCaptured` fires
+- [x] Demo `demo/08-baseline-overlay.html`
+- [x] Demo `demo/09-baseline-compare.html`
+- [ ] Screenshot `docs/screenshots/sg-baseline-overlay.png`
+- [ ] Screenshot `docs/screenshots/sg-baseline-compare.png`
 
 ## Phase 5 — Scheduling (done)
 
