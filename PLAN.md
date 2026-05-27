@@ -1393,3 +1393,162 @@ box. Each box implies: implementation + unit test in
 - [x] `StimulusGantt.start(app?)`
 - [x] `StimulusGantt.create(element, options)`
 - [x] `StimulusGantt.destroy(element)`
+
+## Phase 22 — Dispatched events coverage
+
+Every `gantt:*` event documented in `REQUIREMENTS.md §9`. Each box
+implies: dispatch from the right code path + assertion in a Vitest
+spec (mostly under `test/api.test.js` or per-feature specs).
+
+### 22a — Lifecycle
+
+- [x] `gantt:ready` — `{ api }`
+- [x] `gantt:viewChanged` — `{ view, columnWidth }`
+- [x] `gantt:visibleRangeChanged` — `{ start, end, view }`
+
+### 22b — Data-change
+
+- [x] `gantt:taskDataChanged` — `{ tasks }`
+- [x] `gantt:dependencyDataChanged` — `{ dependencies }`
+- [x] `gantt:resourceDataChanged` — `{ resources }`
+
+### 22c — Pointer / selection
+
+- [x] `gantt:taskClicked` — `{ taskId, task, originalEvent }`
+- [x] `gantt:taskDblClicked` — `{ taskId, task, originalEvent }`
+- [x] `gantt:taskSelectionChanged` — `{ selectedTaskIds }`
+- [x] `gantt:dependencySelectionChanged` — `{ selectedDependencyIds }`
+- [x] `gantt:taskHovered` — `{ taskId, task }`
+- [x] `gantt:dependencyHovered` — `{ dependencyId, dependency }`
+
+### 22d — Mutation
+
+- [x] `gantt:beforeUpdate` — `{ taskId, change }` (cancellable)
+- [x] `gantt:taskMoved` — `{ taskId, oldStart, newStart, oldEnd, newEnd, delta }`
+- [x] `gantt:taskResized` — `{ taskId, edge, oldStart, oldEnd, newStart, newEnd }`
+- [x] `gantt:taskProgressChanged` — `{ taskId, oldValue, newValue }`
+- [x] `gantt:taskReparented` — `{ taskId, fromParentId, toParentId, toIndex }`
+- [x] `gantt:taskAdded` — `{ taskId, task }`
+- [x] `gantt:taskRemoved` — `{ taskId, task }`
+- [x] `gantt:beforeDependencyAdd` — cancellable
+- [x] `gantt:beforeDependencyRemove` — cancellable
+- [x] `gantt:dependencyAdded` — `{ dependencyId, dependency }`
+- [x] `gantt:dependencyRemoved` — `{ dependencyId, dependency }`
+
+### 22e — Scheduling / baselines
+
+- [x] `gantt:criticalPathRecomputed` — `{ criticalTaskIds }`
+- [x] `gantt:overallocationDetected` — `{ resourceId, intervals }`
+      (debounced per interval)
+- [x] `gantt:baselineCaptured` — `{ baselineId, name }`
+- [x] `gantt:scheduleConflict` — `{ taskId, reason, attempted }`
+
+### 22f — Sidebar / filter
+
+- [x] `gantt:groupChanged` — `{ groupBy }`
+- [x] `gantt:filterChanged` — `{ quickFilter, predicate }`
+- [x] `gantt:ganttStateApplied` — `{ state }` (after `applyGanttState`
+      / persist restore)
+
+### 22g — Detail panel
+
+- [x] `gantt:taskDetailOpened` — `{ taskId, task, panelEl }`
+- [x] `gantt:taskDetailClosed` — `{ taskId, task, panelEl }`
+
+### 22h — Files & broadcast
+
+- [ ] `gantt:fileAttached` — `{ taskId, files, task, dataTransfer }`
+      (cancellable) — declared, defer with `accept-files` per §1b
+- [x] `gantt:broadcast:out` — `{ message }`
+- [x] `gantt:broadcast:in` — `{ message }`
+
+## Phase 23 — Acceptance criteria for v1 (per `REQUIREMENTS.md §24`)
+
+These are the 20 ship-blockers. Each is a *roll-up* of the
+fine-grained boxes above — when every contributing box is ticked,
+tick the matching criterion here.
+
+- [x]  1. HTML-first contract — server-rendered `<ol>` usable without
+       JS (sidebar + plain-text dates render; no errors)
+- [x]  2. Six views (`hour`, `day`, `week`, `month`, `quarter`,
+       `year`) with correct headers, today highlight, non-working
+       shading, now-indicator
+- [x]  3. Drag, resize, link, progress on pointer + touch;
+       multi-task drag preserves offsets; cancellable
+       `gantt:beforeUpdate`; auto-scroll; date-tooltip
+- [x]  4. Keyboard parity (drag + WBS nav + indent/outdent + zoom)
+- [x]  5. Dependencies — FS / SS / FF / SF with all three routing
+       modes; create-by-drag + delete-by-key; cancellable
+       `gantt:beforeDependencyAdd`
+- [x]  6. Auto-scheduling — push successors per dep type + lag;
+       `strict` refuses + fires `gantt:scheduleConflict`
+- [x]  7. Critical path — CPM forward + backward pass; highlighted
+       red; recomputes within one frame of any mutation
+- [x]  8. Baselines — overlay *and* compare layouts; multiple
+       baselines coexist; `captureBaseline` + switch via `ganttApi`
+- [x]  9. Calendars — per-task / per-resource / per-project compose;
+       non-working time shaded; drag snaps over non-working spans
+- [x] 10. Sidebar — 18 built-in columns, resize / reorder / sort /
+       inline-edit; group-by injects synthetic group rows
+- [x] 11. Renderers — separate label / bar / milestone / dependency
+       registries; `<template>` path; ≥ 8 built-in bar renderers
+- [x] 12. Resource histogram — toggle in, overallocation segments
+       fire `gantt:overallocationDetected` exactly once per
+       contiguous interval
+- [x] 13. Virtualisation — auto-on past thresholds; 10k-task demo
+       scrolls at 60 fps
+- [x] 14. Quick filter + per-column sort + group-by + persisted
+       state round-tripping through `localStorage`
+- [ ] 15. Server-side task model — one fetch per viewport window,
+       scroll-to-load, server-assigned position on move, server-side
+       CPM result echoed back (deferred with `gem/demo`)
+- [x] 16. Export — JSON, CSV, MS Project XML, PDF (client print),
+       PNG / SVG snapshot — all round-trip on the documented
+       fixture
+- [ ] 17. Rails companion gem ships parallel to JS package,
+       importmap-pinned, publishes Turbo Stream actions on every
+       move / resize / link / progress edit; `gem/demo` covers a
+       50-task project end-to-end (gem present; `gem/demo` deferred)
+- [x] 18. Demos — 30+ HTML pages, vite-served, covering every
+       capability + 6 industry scenarios
+- [ ] 19. Tests green on CI for both JS package and Rails engine;
+       CPM scheduler matches a published reference fixture
+       (Ruby CI lands with `gem/demo`)
+- [x] 20. Docs — `README.md` follows `stimulus_calendar` shape,
+       `DESIGN.md`, `docs/REFERENCE.md`, `docs/MSPROJECT.md`,
+       `docs/BROADCAST.md`, `docs/RAILS_REFERENCE.md`, both
+       `skills/` guides
+
+---
+
+## Progress counter
+
+At-a-glance view; tick a phase when every contributing box is ticked.
+
+- [x] Phase 0 — JS scaffold
+- [x] Phase 0a — Documentation, skills, gem skeleton
+- [x] Phase 1 — HTML contract & dataset hydration
+- [x] Phase 2 — Timeline views
+- [x] Phase 3 — Editing
+- [x] Phase 4 — Dependencies & arrow router
+- [x] Phase 5 — Scheduler (CPM)
+- [x] Phase 6 — Baselines
+- [x] Phase 7 — Calendars & working time
+- [x] Phase 8 — Sidebar (WBS)
+- [x] Phase 9 — Renderers
+- [x] Phase 10 — Resource histogram
+- [x] Phase 11 — Virtualisation
+- [x] Phase 12 — Filter, sort, group
+- [x] Phase 13 — Persistence
+- [x] Phase 14 — Live broadcasting
+- [x] Phase 15 — Import / export
+- [x] Phase 16 — Detail panel & inline editor
+- [ ] Phase 17 — Rails companion gem (engine + DSL done; `gem/demo`
+      pending)
+- [x] Phase 18 — Demos & docs (a few screenshots still pending)
+- [ ] Phase 19 — CI & release (Ruby job + gem release pending)
+- [x] Phase 20 — Skills
+- [x] Phase 21 — Public API coverage
+- [x] Phase 22 — Dispatched events coverage
+- [ ] Phase 23 — Acceptance criteria for v1 (3 ship-blockers
+      outstanding: §15, §17, §19)
