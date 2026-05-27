@@ -233,11 +233,61 @@ controller's store. Each box below is one attribute or behaviour from
       `setTaskData(...)` called before `gantt:ready`
 - [x] Disconnect tears down listeners + persisted writes flushed
 
-## Phase 2 — Six views (done)
+## Phase 2 — Timeline views (`hour`, `day`, `week`, `month`, `quarter`, `year`)
 
-- [x] `hour`, `day`, `week`, `month`, `quarter`, `year`
-- [x] Header tiers (year/quarter, month/week, day/hour …)
-- [x] Today highlight + now-indicator
+Each view ships a `docs/screenshots/sg-<view>.png` capture and a
+demo page that boots straight into that view (or zooms to it).
+
+### 2a — Per-view rendering
+
+- [x] View: `hour` — minute-resolution slot grid → `sg-hour.png`
+- [x] View: `day` — single-day with hour columns → `sg-day.png`
+- [x] View: `week` — 7-day with day columns → `sg-week.png`
+- [x] View: `month` — multi-week with day columns → `sg-month.png`
+- [x] View: `quarter` — ~13-week with week columns → `sg-quarter.png`
+- [x] View: `year` — 12-month with month columns → `sg-year.png`
+
+### 2b — Header tiers
+
+- [x] Tier resolution table per view (e.g. month → top "month name",
+      bottom "day number")
+- [x] `data-gantt-header-height-value` doubles when two tiers are
+      shown
+- [x] Locale-aware tier text via `Intl.DateTimeFormat` (UTC-formatted
+      so positioning + label agree — same fix as calendar Phase 17)
+
+### 2c — Shared timeline chrome
+
+- [x] Today highlight (vertical band on the active column)
+- [x] Now-indicator vertical red line (hour/day/week views)
+- [x] Non-working-day shading (composes with `non-working-days` +
+      `holidays`)
+- [x] Working-hours shading (hour/day views, gated by
+      `working-hours`)
+- [x] `auto-fit-range="tasks"` spans the active project; `viewport`
+      sticks to `range-start`/`range-end`; `false` honours `date`
+- [x] `fitProject()` recomputes column-width to fit everything
+- [x] `scrollToTask(id)` and `scrollToDate(date)` align to the
+      active column
+- [x] `getVisibleRange()` returns `{ start, end }` of the rendered
+      slice (used by server-side fetch)
+- [x] View switching preserves vertical scroll + selection
+
+### 2d — Per-view overrides (`views`)
+
+- [x] `views: { week: { columnWidth: 64 } }` merges over the
+      view's defaults
+- [x] `setView(name)` reads the override map on every switch
+- [x] Programmatic zoom (`zoomIn` / `zoomOut`) walks the view list in
+      order (`hour ↔ day ↔ week ↔ month ↔ quarter ↔ year`)
+- [x] `zoomTo(view)` is alias for `setView`
+
+### 2e — Demos & screenshots
+
+- [x] `demo/03-zoom-views.html` — toolbar buttons for every view
+- [ ] One screenshot per view captured by `scripts/screenshot.mjs`
+      and dropped into `docs/screenshots/` (year view still missing
+      a fresh capture)
 
 ## Phase 3 — Editing (done)
 
