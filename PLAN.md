@@ -504,12 +504,125 @@ the live tasks.
 - [x] Compare layout
 - [x] Multiple baselines coexist; pick via `baseline-id`
 
-## Phase 7 — Calendars (done)
+## Phase 7 — Calendars & working time
 
-- [x] Named calendar registry
-- [x] Per-task / per-resource / per-project resolution
-- [x] Non-working shading per view
-- [x] `addBusinessDuration` / `durationBetween`
+`src/lib/calendar.js` owns the working-time arithmetic. Resolution
+order is **task → resource → project → default**.
+
+### 7a — Registry
+
+- [x] `data-gantt-calendars-value` JSON map
+- [x] `data-gantt-calendar-value` chart-wide default id
+- [x] Built-in `default` calendar (Mon–Fri 09:00–17:00)
+- [x] Per-resource `calendar` field
+- [x] Per-task `data-task-calendar-id`
+
+### 7b — Calendar shape
+
+- [x] `weekdays: number[]` (0 = Sun)
+- [x] `hours: [["09:00","17:00"], …]` (multiple shift windows)
+- [x] `holidays: ISOString[]`
+- [x] Multi-shift days (e.g. `09:00–12:30, 13:30–17:00`)
+
+### 7c — Arithmetic helpers (exported)
+
+- [x] `addBusinessDuration(date, dur, cal)`
+- [x] `durationBetween(a, b, cal)`
+- [x] `isWorkingTime(date, cal)`
+- [x] `nextWorkingMinute(date, cal)`
+- [x] DST-safe (test fixtures cross spring-forward + fall-back)
+
+### 7d — Rendering side
+
+- [x] Non-working columns shaded across every view
+- [x] Working-hours band shaded in hour / day views
+- [x] Holidays shaded with dotted overlay (distinct from weekend)
+- [x] Drag snaps over non-working spans by default (a 2-day task
+      dragged onto Friday lands on Tuesday)
+
+### 7e — Tests & demos
+
+- [x] `test/calendar.test.js` — weekday-only, multi-shift, DST,
+      holiday-skipping
+- [x] Demo `demo/17-calendar-non-working-time.html`
+- [x] Demo `demo/18-multi-calendar-resources.html`
+- [x] Demo `demo/44-tradie-trade-calendars.html` (industry scenario)
+
+## Phase 8 — Sidebar (WBS)
+
+`src/controllers/gantt_sidebar_controller.js`. A mini-grid that
+scrolls vertically in sync with the timeline. Columns are declared
+via `data-gantt-sidebar-columns-value` (JSON array) or via the API.
+
+### 8a — Built-in columns (each is one box)
+
+- [x] `wbs` — `1`, `1.1`, `1.2`, … numbering
+- [x] `name` — task name + indent + expand chevron
+- [x] `start`
+- [x] `end`
+- [x] `duration`
+- [x] `effort`
+- [x] `progress`
+- [x] `resources` — chip list
+- [x] `predecessors` — `"3FS+2d, 5SS"` notation
+- [x] `actual-start`
+- [x] `actual-end`
+- [x] `baseline-start`
+- [x] `baseline-end`
+- [x] `slack`
+- [x] `critical` — boolean indicator dot
+- [x] `cost`
+- [x] `priority`
+- [x] `status` — derived from progress + dates (`Not started` /
+      `In progress` / `Late` / `Done`)
+- [x] `indicators` — icons for attachments, notes, recurrence,
+      conflict, late
+
+### 8b — Per-column behaviour
+
+- [x] `width` resize via drag on column-edge → persisted
+- [x] `align: left|center|right`
+- [x] `hidden: true` — column kept registered but not rendered
+- [x] `frozen: true` — column pinned to the left of horizontal scroll
+- [x] Reorder by dragging the header
+- [x] Sort: `asc|desc|undefined` per column
+- [x] `setColumnVisible(field, bool)`
+- [x] `moveColumn(field, toIndex)`
+- [x] `setSidebarColumns(cols)`
+- [x] `getSidebarColumns()`
+- [x] `setSortField(field, dir)`
+
+### 8c — Inline editors (per editor type)
+
+- [x] `text` — single-line input, Enter / Tab commits, Esc cancels
+- [x] `number` — `<input type=number>` with min/max
+- [x] `duration` — accepts `"5d"`, `"08:00"`, raw seconds
+- [x] `date` — `<input type=date>` (date-only) and date-time fallback
+- [x] `progress` — `<input type=range>` 0–1
+- [x] `resources` — chip-picker against `setResourceData([...])`
+- [x] `predecessors` — chip-picker over task ids with FS/SS/FF/SF +
+      lag inline
+
+### 8d — Sidebar chrome
+
+- [x] `sidebar-width` initial pixel width
+- [x] `sidebar-collapsed` toggles icon-only mode
+- [x] `setSidebarWidth(px)` / `setSidebarCollapsed(bool)` API
+- [x] Vertical scroll sync with timeline (single `scrollTop`)
+- [x] `add-task="true"` shows "+ Add task" inline affordance at the
+      bottom
+- [x] Group rows: `setGroupBy(field)` injects synthetic group rows
+      above WBS hierarchy
+- [x] Group collapse persisted alongside task-collapse
+
+### 8e — Tree mutations
+
+- [x] `expandTask(id)` / `collapseTask(id)`
+- [x] `expandAll()` / `collapseAll()`
+- [x] `expandToLevel(n)`
+- [x] `indentTask(id)` / `outdentTask(id)`
+- [x] `moveTask(id, { parentId, toIndex })`
+- [x] `gantt:taskReparented` event
 
 ## Phase 8 — Sidebar (WBS) (done)
 
