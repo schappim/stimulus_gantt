@@ -788,11 +788,188 @@ tasks render at 60 fps.
 - [x] Sort field + direction
 - [x] Group-by injection
 
-## Phase 13 — Persistence (done)
+## Phase 13 — Persistence (`persist-key`)
 
-- [x] `localStorage["sgantt:" + key]` round-trip
-- [x] 200 ms debounce
-- [x] View / sidebar / collapse / filter / baseline / critical
+`src/lib/persist.js`. JSON state round-trips through
+`localStorage["sgantt:" + key]`.
+
+### 13a — Persisted fields (per `REQUIREMENTS.md §16`)
+
+- [x] View name
+- [x] Column width (timeline)
+- [x] Sidebar width
+- [x] Sidebar collapsed state
+- [x] Sidebar column order
+- [x] Sidebar column widths
+- [x] Sidebar column visibility
+- [x] Sort: `{ field, direction }`
+- [x] Group-by field
+- [x] Per-task expand / collapse map
+- [x] Quick-filter string
+- [x] Active baseline id
+- [x] Baseline display mode (`hidden` / `overlay` / `compare`)
+- [x] Critical-path on/off
+- [x] Slack-display on/off
+- [x] Read-only toggle
+- [ ] Scroll position (declared session-scoped, off by default —
+      opt-in flag not yet implemented)
+
+### 13b — Round-trip mechanics
+
+- [x] Writes debounced 200 ms
+- [x] Flushed on `beforeunload`
+- [x] Restore broadcasts a single `gantt:ganttStateApplied` event
+      after layout
+- [x] `getGanttState()` / `applyGanttState(state)` exposed on the API
+- [x] `clearPersistedState()` API
+- [x] No task data persisted (server / host is the source of truth)
+
+## Phase 14 — Live broadcasting
+
+`src/lib/broadcast/`. Transport-agnostic core + four adapters. The
+mutation envelope shape is `{ op, payload, origin, ts }`.
+
+### 14a — Core bus
+
+- [x] `lib/broadcast/bus.js` — `BroadcastBus` (subscribe / publish,
+      JSON envelope with `op`, `payload`, `meta`, `origin`)
+- [x] `lib/broadcast/index.js` — adapter resolution from
+      `data-gantt-broadcast-value`
+- [x] Echo suppression by `origin` id (originator ignores its own
+      messages)
+- [x] Last-write-wins by task id; overridable via
+      `ganttBroadcastResolve` callback
+
+### 14b — Outbound wiring
+
+- [x] `addTask` / `updateTask` / `removeTaskById` publish on the bus
+- [x] `addDependency` / `removeDependencyById` publish on the bus
+- [x] Pointer drag commits publish on the bus
+- [x] Per-mutation `gantt:broadcast:out` event (cancellable —
+      `preventDefault` prevents publish)
+
+### 14c — Inbound wiring
+
+- [x] Bus → store mutation via `applyTransaction`
+- [x] `gantt:broadcast:in` event fired for each inbound message
+- [x] Origin tag prevents echo loops
+- [x] Unknown `op` logged (not thrown) — forward compatibility
+
+### 14d — Adapter: BroadcastChannel
+
+- [x] `lib/broadcast/broadcast_channel.js`
+- [x] Channel name from `data-gantt-broadcast-channel-value`
+- [x] Tab-to-tab sync inside one browser, no server
+- [x] Demo `demo/25-broadcast-two-tabs.html`
+
+### 14e — Adapter: WebSocket
+
+- [x] `lib/broadcast/websocket.js`
+- [x] URL from `data-gantt-broadcast-channel-value`
+- [x] Auto-reconnect with backoff
+- [x] `wss://` honoured
+
+### 14f — Adapter: Action Cable
+
+- [x] `lib/broadcast/action_cable.js`
+- [x] Channel + identifier from option
+- [x] Subscribes on connect, unsubscribes on disconnect
+- [x] Reuses `window.App.cable` if available, otherwise creates
+
+### 14g — Adapter: Turbo Stream
+
+- [x] `lib/broadcast/turbo_stream.js`
+- [x] `<turbo-stream action="gantt-task-add|update|remove">` handler
+- [x] `gantt-dependency-add|remove` handlers
+- [x] `gantt-bulk` handler (atomic batch)
+- [x] `gantt-conflict` handler (server vs client value conflict)
+- [x] Outbound: publishes as Turbo Stream over the host's existing
+      cable connection
+
+### 14h — Options & filter
+
+- [x] `data-gantt-broadcast-value` (`false` / `turbo-stream` /
+      `action-cable` / `websocket` / `broadcast-channel`)
+- [x] `data-gantt-broadcast-channel-value`
+- [x] `data-gantt-broadcast-filter-value` predicate decides which
+      local mutations to publish
+- [x] `setBroadcastFilter(fn)` API equivalent
+
+### 14i — Tests & docs
+
+- [x] `test/broadcast.test.js` — bus + each adapter
+- [ ] End-to-end two-instance test (mirroring calendar's
+      `broadcast_e2e.test.js`) on happy-dom with real
+      `BroadcastChannel` — the catch-net for silent-drop regressions
+- [x] `docs/BROADCAST.md` — payload schema + Rails recipe
+
+## Phase 15 — Import / export
+
+`src/lib/export.js`.
+
+### 15a — JSON
+
+- [x] `getDataAsJson()` — single document with `tasks`,
+      `dependencies`, `resources`, `baselines`, `calendars`
+- [x] `setTaskData(...)` consumes the same shape
+- [x] Round-trip stable (test fixture)
+
+### 15b — CSV
+
+- [x] `getDataAsCsv({ columns })`
+- [x] Predecessor encoding `"3FS+2d, 5SS"` (PM convention)
+- [x] Column subset honoured
+- [x] Date / duration / number formatting locale-aware
+
+### 15c — MS Project XML
+
+- [x] `getDataAsMsProjectXml()` (export)
+- [x] `setTaskDataFromMsProjectXml(xml)` (import)
+- [x] Lossless for tasks, dependencies, calendars, resources,
+      baselines (the MS Project subset)
+- [x] `docs/MSPROJECT.md` documents round-trip caveats
+- [x] Demo `demo/24-ms-project-xml-import.html`
+
+### 15d — PDF (print)
+
+- [x] `printToPdf({ scale, paperSize, fitWidth })` — client-side
+      `window.print()` with `@media print` stylesheet
+- [x] `print-mode="fit-to-page"` swaps the stylesheet
+- [x] Demo `demo/23-print-pdf.html`
+- [ ] Server-side renderer (Grover-based) — declared in REQUIREMENTS;
+      lands with the Rails gem follow-up
+
+### 15e — PNG / SVG snapshot
+
+- [x] `exportImage({ format, range })` — `"png"` / `"svg"`,
+      `"visible"` / `"project"`
+- [x] Used by `scripts/screenshot.mjs` for the docs captures
+
+## Phase 16 — Detail panel & inline editor
+
+- [x] `gantt-detail-panel` controller — clones
+      `<template id="task-detail-tpl">`
+- [x] `data-gantt-detail-layout-value` `"popover"` (default) /
+      `"rail"`
+- [x] Rail width via `data-gantt-detail-width-value`
+- [x] Click-out / Esc closes
+- [x] `openTaskDetail(id)` / `closeTaskDetail()` / `isTaskDetailOpen()`
+      API
+- [x] `gantt:taskDetailOpened` / `gantt:taskDetailClosed` events
+- [x] Commits via `applyTransaction` → standard mutation pipeline
+- [x] Bindings: `data-bind`, `data-bind-attr`, `data-detail-if`
+
+- [x] `gantt-task-editor` controller — clones
+      `<template id="task-editor">`
+- [x] `[data-editor-field="<f>"]` seeded from task, read back on
+      commit
+- [x] Enter / Tab commits; Esc cancels
+- [x] `[data-editor-commit]` / `[data-editor-cancel]` buttons fire
+      the same handlers
+
+- [x] Demo `demo/26-task-detail-popover.html`
+- [x] Demo `demo/27-task-detail-rail.html`
+- [x] Demo `demo/13-inline-edit-sidebar.html`
 
 ## Phase 14 — Broadcasting (done)
 
