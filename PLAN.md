@@ -289,15 +289,87 @@ demo page that boots straight into that view (or zooms to it).
       and dropped into `docs/screenshots/` (year view still missing
       a fresh capture)
 
-## Phase 3 — Editing (done)
+## Phase 3 — Editing: drag, resize, link, progress
 
-- [x] Drag move, resize-start, resize-end
-- [x] Pointer-events based (touch + pen + mouse)
-- [x] `gantt:beforeUpdate` cancellable hook
-- [x] Auto-scroll on chart edges
-- [x] Drag preview tooltip
-- [x] Cancel-on-Esc
-- [x] Multi-select bulk shift
+Pointer-events based throughout — works on mouse, pen, touch. The
+three drag modes per bar (`move`, `resize-start`, `resize-end`) and
+the dependency-linking end-cap are all driven by the same DnD state
+machine in `src/lib/dnd.js` and exercised in tests via the
+`beginDragTask` / `endDrag` harness without synthetic pointer events.
+
+### 3a — Drag move
+
+- [x] Body of bar = move handle when `editable && task-start-editable`
+- [x] Snap to `snap-duration` (defaults to active view's slot)
+- [x] `gantt:beforeUpdate` fires with `{ taskId, change }` —
+      cancellable with `preventDefault()`
+- [x] `gantt:taskMoved` fires on commit with old/new start + end + delta
+- [x] Locked tasks (`data-task-locked="true"`) refuse drag
+- [x] `read-only` chart refuses every drag
+- [x] Cancel-on-Esc reverts the optimistic DOM + fires `beforeUpdate`
+      with `cancelled: true`
+- [x] Auto-scroll horizontally when cursor nears chart edge
+- [x] Auto-scroll vertically when cursor nears sidebar edge
+- [x] Drag preview pill anchored to cursor shows new start / end ISO
+
+### 3b — Resize edges
+
+- [x] Trailing-edge handle when `editable && task-duration-editable`
+- [x] Leading-edge handle when `eventResizableFromStart` /
+      `task-start-editable` allow shrinking from the start
+- [x] Resize handle width configurable via
+      `data-gantt-resize-handle-width-value` (default `8px`)
+- [x] `gantt:taskResized` fires with `{ taskId, edge,
+      oldStart/oldEnd, newStart/newEnd }`
+- [x] Resize snaps to `snap-duration`
+- [x] Resize honours `min-duration` / `max-duration` per task (when
+      declared in `extendedProps`)
+
+### 3c — Link end-cap (drag-to-create-dependency)
+
+- [x] End-cap appears on hover when `task-link-editable`
+- [x] Drag end-cap to body of another task → creates `FS` dep
+- [x] Drag end-cap to leading edge → creates `SS` dep
+- [x] `gantt:beforeDependencyAdd` cancellable
+- [x] `gantt:dependencyAdded` on commit
+- [x] `data-task-locked` tasks refuse to be the new dep's source
+- [x] Visual indicator: drag-line follows the cursor until release
+
+### 3d — Progress
+
+- [x] Inset stripe is the progress drag handle when
+      `editable && task-progress-editable`
+- [x] Snap to nearest 5 % (configurable via
+      `data-gantt-progress-snap-value`)
+- [x] `gantt:taskProgressChanged` fires on commit
+
+### 3e — Multi-select bulk reschedule
+
+- [x] `task-selection="multiple"` enables Cmd/Ctrl+click adds
+- [x] Dragging any selected bar moves the whole set as a rigid group
+- [x] Relative offsets preserved across the group
+- [x] Linked dependencies travel with the group (arrows redraw mid-drag)
+- [x] `←/→` with multiple tasks selected shifts every selection by
+      `snap-duration`
+
+### 3f — Auto-scheduling on commit
+
+- [x] `auto-schedule="true"` reflows successors through dependency
+      types + lag after every move / resize
+- [x] `auto-schedule-strategy="forward"` only pushes downstream
+- [x] `auto-schedule-strategy="both"` also pulls slack-laden
+      predecessors when shrinking a task
+- [x] `auto-schedule-strategy="strict"` refuses changes that would
+      break a constraint, firing `gantt:scheduleConflict`
+- [x] Tests cover FS / SS / FF / SF reflow with positive + negative lag
+
+### 3g — Programmatic harness
+
+- [x] `beginDragTask(id, { mode })` (`move` / `resize-start` /
+      `resize-end` / `link`)
+- [x] `endDrag({ commit, newStart, newEnd, toTaskId })`
+- [x] Same code path as a real pointer drag — tests assert on the
+      mutation pipeline, not synthetic pointer events
 
 ## Phase 4 — Dependencies (done)
 
