@@ -1132,23 +1132,127 @@ Rails app integration tests. The gem ships under
       (deferred until the audit-log migration lands)
 - [ ] `gem build stimulus_gantt_rails.gemspec` smoke step in CI
 
-## Phase 18 — Demos + docs (done)
+## Phase 18 — Demos & docs
 
-- [x] 30+ HTML demos (Vite-served, importing `src/index.js`)
-- [x] `demo/index.html` index
-- [x] `README.md` — install / contract / attributes / API / events / renderers / calendars / Rails
+### 18a — Core demos (per feature)
+
+- [x] `demo/01-basic.html` — minimum boot
+- [x] `demo/02-json-data.html` — `data-gantt-task-source-value`
+- [x] `demo/03-zoom-views.html` — all six views
+- [x] `demo/04-drag-move-resize.html`
+- [x] `demo/05-dependency-arrows.html` — pre-loaded deps
+- [x] `demo/06-create-link-by-drag.html` — end-cap affordance
+- [x] `demo/07-critical-path.html`
+- [x] `demo/08-baseline-overlay.html`
+- [x] `demo/09-baseline-compare.html`
+- [x] `demo/10-milestones.html`
+- [x] `demo/11-summary-rollup.html`
+- [x] `demo/12-wbs-sidebar-columns.html`
+- [x] `demo/13-inline-edit-sidebar.html`
+- [x] `demo/14-grouping-by-resource.html`
+- [x] `demo/15-resource-histogram.html`
+- [x] `demo/16-overallocation.html`
+- [x] `demo/17-calendar-non-working-time.html`
+- [x] `demo/18-multi-calendar-resources.html`
+- [x] `demo/19-virtual-10k-tasks.html`
+- [x] `demo/20-multi-select-bulk-reschedule.html`
+- [x] `demo/21-quick-filter.html`
+- [x] `demo/22-persisted-state.html`
+- [x] `demo/23-print-pdf.html`
+- [x] `demo/24-ms-project-xml-import.html`
+- [x] `demo/25-broadcast-two-tabs.html`
+- [x] `demo/26-task-detail-popover.html`
+- [x] `demo/27-task-detail-rail.html`
+- [x] `demo/28-custom-bar-renderer.html`
+- [x] `demo/29-keyboard-nav.html`
+- [x] `demo/30-toolbar.html`
+
+### 18b — Industry-scenario demos
+
+- [x] `demo/40-tradie-bathroom-reno.html`
+- [x] `demo/41-tradie-house-build.html`
+- [x] `demo/42-tradie-jobs-by-tech.html`
+- [x] `demo/43-tradie-multi-site.html`
+- [x] `demo/44-tradie-trade-calendars.html`
+- [x] `demo/45-tradie-compliance-rollout.html`
+
+### 18c — Docs
+
+- [x] `demo/index.html` — landing page linking every demo
+- [x] `README.md` — install / contract / attributes / API / events /
+      renderers / calendars / Rails section
 - [x] `DESIGN.md` — module map + render pipeline
 - [x] `RAILS.md` — checklist for hosts wiring up the gem
-- [x] `docs/REFERENCE.md`, `docs/BROADCAST.md`, `docs/MSPROJECT.md`,
-      `docs/RAILS_REFERENCE.md`
+- [x] `docs/REFERENCE.md` — full programmatic JS API reference
+- [x] `docs/BROADCAST.md` — payload schema + Rails recipe
+- [x] `docs/MSPROJECT.md` — MS Project XML import / export mapping
+- [x] `docs/RAILS_REFERENCE.md` — full server-side `Gantt` / `Field`
+      / DSL reference
+
+### 18d — Screenshots & GIFs
+
+- [x] `docs/screenshots/` directory present, README links absolute
+      GitHub raw URLs (commit `4e24f0a`)
+- [x] `scripts/screenshot.mjs` — Playwright-driven capture script
+- [ ] One screenshot per view (year still missing — see §2e)
+- [ ] `docs/screenshots/sg-broadcast.gif` — live-sync animation
+      (mirrors calendar's `cal-broadcast.gif`)
+- [ ] `docs/screenshots/sg-overallocation.png` (see §10)
+- [ ] `docs/screenshots/sg-baseline-overlay.png` /
+      `…-baseline-compare.png` (see §6)
 
 ## Phase 19 — CI & release
 
-- [ ] GitHub Actions workflow (Node matrix, build + test)
-- [ ] Ruby workflow for the gem
-- [ ] `prepublishOnly` gate (already wired in `package.json`)
+### 19a — CI
 
-## Phase 20 — Skills
+- [x] `.github/workflows/ci.yml` — Node 20, `npm ci`, `npm test`,
+      `npm run build:lib` on every push / PR
+- [ ] Ruby job — `cd gem/demo && bin/rails test` (lands with §17g)
+- [ ] `gem build stimulus_gantt_rails.gemspec` smoke step
+- [ ] Lint step (ESLint + Rubocop in `gem/demo`)
 
-- [x] `skills/stimulus-gantt-js/` LLM usage guide
-- [x] `skills/stimulus-gantt-rails/` LLM usage guide
+### 19b — npm release
+
+- [x] `prepublishOnly` wired in `package.json` (build + test)
+- [x] `files` whitelist verified (`dist`, `src`, `README.md`,
+      `LICENSE`)
+- [x] `exports` map covers `.` (ESM), `./style.css`, `./dist/*`,
+      `./package.json`
+- [ ] CDN bundle smoke test (`dist/stimulus_gantt.js` in a plain
+      HTML page)
+- [ ] Tag `0.1.0` + release notes
+- [ ] Verify fresh-sandbox install paths
+      (`npm i @ninjaai/stimulus_gantt` and
+      `bundle add stimulus_gantt_rails`)
+
+### 19c — Rails gem release
+
+- [ ] `gem build` step in CI
+- [ ] Push to RubyGems
+- [ ] Verify in a fresh `rails new` sandbox
+
+## Phase 20 — Skills (LLM usage guides)
+
+### 20a — `skills/stimulus-gantt-js/SKILL.md`
+
+- [x] Frontmatter (`name`, `description`)
+- [x] Setup section (IIFE / npm / Rails install paths)
+- [x] Minimal Gantt section
+- [x] Attribute reference (mirrors README §3-§6)
+- [x] Events reference
+- [x] Public API reference
+- [x] Renderers section
+- [x] Calendars / critical-path / baselines section
+- [x] Broadcasting section
+- [x] Gotchas section
+
+### 20b — `skills/stimulus-gantt-rails/SKILL.md`
+
+- [x] Frontmatter
+- [x] Setup section (bundle add, importmap pin, css link, route mount)
+- [x] Declaring a `Gantt` class
+- [x] Broadcastable concern
+- [x] Render partial
+- [x] Custom Turbo Stream actions
+- [x] Optimistic-id pattern
+- [x] Concurrency / conflicts gotchas
