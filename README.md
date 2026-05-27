@@ -9,7 +9,7 @@
 > rows, multi-select bulk reschedule, a public `ganttApi` — no React, no
 > build-time config object, no third-party scheduling framework.
 
-![Basic Gantt — tasks declared in HTML, controller hydrates on connect](docs/screenshots/01-basic.png)
+![Basic Gantt — tasks declared in HTML, controller hydrates on connect](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/01-basic.png)
 
 The chart is the [calendar](https://github.com/schappim/stimulus_calendar) /
 [kanban](https://github.com/schappim/stimulus_kanban) /
@@ -440,27 +440,27 @@ panels / keyboard / toolbar.
 
 **Dependency arrows — FS / SS / FF / SF, orthogonal / smooth / straight routing**
 
-![Dependency arrows demo](docs/screenshots/05-dependency-arrows.png)
+![Dependency arrows demo](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/05-dependency-arrows.png)
 
 **Critical path — tasks on the longest dependency chain flagged at runtime**
 
-![Critical path demo](docs/screenshots/07-critical-path.png)
+![Critical path demo](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/07-critical-path.png)
 
 **Resource histogram — per-resource allocation rail under the chart**
 
-![Resource histogram demo](docs/screenshots/15-resource-histogram.png)
+![Resource histogram demo](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/15-resource-histogram.png)
 
 **10 000 tasks — row virtualisation kicks in past the configured threshold**
 
-![Virtualised 10k tasks demo](docs/screenshots/19-virtual-10k.png)
+![Virtualised 10k tasks demo](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/19-virtual-10k.png)
 
 **Tradie / construction — single-trade sequential bathroom reno**
 
-![Bathroom reno tradie demo](docs/screenshots/40-tradie-bathroom.png)
+![Bathroom reno tradie demo](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/40-tradie-bathroom.png)
 
 **Tradie / construction — multi-phase new-build house with WBS rollup**
 
-![New-build house tradie demo](docs/screenshots/41-tradie-house-build.png)
+![New-build house tradie demo](https://raw.githubusercontent.com/schappim/stimulus_gantt/main/docs/screenshots/41-tradie-house-build.png)
 
 ---
 
