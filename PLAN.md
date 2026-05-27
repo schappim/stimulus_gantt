@@ -1256,3 +1256,140 @@ Rails app integration tests. The gem ships under
 - [x] Custom Turbo Stream actions
 - [x] Optimistic-id pattern
 - [x] Concurrency / conflicts gotchas
+
+## Phase 21 — Public API coverage matrix (`element.ganttApi`)
+
+Every method documented in `REQUIREMENTS.md §8`, tracked as its own
+box. Each box implies: implementation + unit test in
+`test/api.test.js` + a README / `docs/REFERENCE.md` paragraph.
+
+### 21a — Data
+
+- [x] `setTaskData(tasks)`
+- [x] `getTaskData()`
+- [x] `setDependencyData(deps)`
+- [x] `getDependencyData()`
+- [x] `setResourceData(rs)`
+- [x] `getResourceData()`
+- [x] `setBaselineData(bs)`
+- [x] `getBaselineData()`
+- [x] `applyTransaction({ add, update, remove })`
+
+### 21b — Per-row mutation
+
+- [x] `addTask(task, { parentId, atIndex })`
+- [x] `updateTask(task)`
+- [x] `removeTaskById(id)`
+- [x] `addDependency(dep)`
+- [x] `removeDependencyById(id)`
+- [x] `moveTask(id, { parentId, toIndex })`
+- [x] `indentTask(id)`
+- [x] `outdentTask(id)`
+
+### 21c — Scheduling
+
+- [x] `reschedule(id, { start, end, duration })`
+- [x] `scheduleProject()`
+- [x] `setTaskProgress(id, value)`
+- [x] `setTaskConstraint(id, { type, date })`
+
+### 21d — Selection
+
+- [x] `getSelectedTaskIds()`
+- [x] `getSelectedTasks()`
+- [x] `selectTask(id)`
+- [x] `deselectTask(id)`
+- [x] `selectRange(fromId, toId)`
+- [x] `clearSelection()`
+- [x] `getSelectedDependencyIds()`
+
+### 21e — View / zoom
+
+- [x] `setView(viewName)`
+- [x] `getView()`
+- [x] `zoomIn()`
+- [x] `zoomOut()`
+- [x] `zoomTo(view)`
+- [x] `setColumnWidth(px)`
+- [x] `fitProject()`
+- [x] `scrollToTask(id, { align })`
+- [x] `scrollToDate(date)`
+- [x] `getVisibleRange()`
+
+### 21f — Sidebar
+
+- [x] `setSidebarColumns(cols)`
+- [x] `getSidebarColumns()`
+- [x] `setSidebarWidth(px)`
+- [x] `setSidebarCollapsed(bool)`
+- [x] `setColumnVisible(field, bool)`
+- [x] `moveColumn(field, toIndex)`
+- [x] `setSortField(field, dir)`
+- [x] `setGroupBy(field)`
+- [x] `getGroupBy()`
+
+### 21g — Tree
+
+- [x] `expandTask(id)`
+- [x] `collapseTask(id)`
+- [x] `expandAll()`
+- [x] `collapseAll()`
+- [x] `expandToLevel(n)`
+
+### 21h — Critical path
+
+- [x] `setCriticalPath(bool)`
+- [x] `getCriticalPathIds()`
+- [x] `getTaskSlack(id)`
+
+### 21i — Baselines
+
+- [x] `captureBaseline({ id, name })`
+- [x] `setActiveBaseline(id)`
+- [x] `clearBaseline(id)`
+
+### 21j — Filter & search
+
+- [x] `setQuickFilter(q)`
+- [x] `getQuickFilter()`
+- [x] `setTaskFilter(predicate)`
+- [x] `getTaskFilter()`
+
+### 21k — Hit testing
+
+- [x] `taskFromPoint(x, y)`
+- [x] `dateFromPoint(x, y)`
+- [x] `rowFromPoint(x, y)`
+
+### 21l — Drag programmatic
+
+- [x] `beginDragTask(id, { mode })`
+- [x] `endDrag({ commit, newStart, newEnd })`
+
+### 21m — Persistence
+
+- [x] `getGanttState()`
+- [x] `applyGanttState(state)`
+- [x] `clearPersistedState()`
+
+### 21n — Export
+
+- [x] `getDataAsJson()`
+- [x] `getDataAsCsv({ columns })`
+- [x] `getDataAsMsProjectXml()`
+- [x] `setTaskDataFromMsProjectXml(xml)`
+- [x] `printToPdf({ scale, paperSize, fitWidth })`
+- [x] `exportImage({ format, range })`
+
+### 21o — Detail panel
+
+- [x] `openTaskDetail(id)`
+- [x] `closeTaskDetail()`
+- [ ] `isTaskDetailOpen()` — declared in REQUIREMENTS §8; verify
+      against `gantt_detail_panel_controller.js`
+
+### 21p — Library lifecycle (IIFE entry point)
+
+- [x] `StimulusGantt.start(app?)`
+- [x] `StimulusGantt.create(element, options)`
+- [x] `StimulusGantt.destroy(element)`
