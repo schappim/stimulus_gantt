@@ -9,6 +9,8 @@
 > rows, multi-select bulk reschedule, a public `ganttApi` — no React, no
 > build-time config object, no third-party scheduling framework.
 
+![Basic Gantt — tasks declared in HTML, controller hydrates on connect](docs/screenshots/01-basic.png)
+
 The chart is the [calendar](https://github.com/schappim/stimulus_calendar) /
 [kanban](https://github.com/schappim/stimulus_kanban) /
 [grid](https://github.com/schappim/stimulus_grid) sibling — same philosophy,
@@ -433,6 +435,32 @@ WBS columns / inline edit / grouping / resource histogram / overallocation
 / calendars / 10k tasks / multi-select / quick filter / persisted state /
 print / MS Project XML / two-tab broadcast / custom renderer / detail
 panels / keyboard / toolbar.
+
+### Selected screenshots
+
+**Dependency arrows — FS / SS / FF / SF, orthogonal / smooth / straight routing**
+
+![Dependency arrows demo](docs/screenshots/05-dependency-arrows.png)
+
+**Critical path — tasks on the longest dependency chain flagged at runtime**
+
+![Critical path demo](docs/screenshots/07-critical-path.png)
+
+**Resource histogram — per-resource allocation rail under the chart**
+
+![Resource histogram demo](docs/screenshots/15-resource-histogram.png)
+
+**10 000 tasks — row virtualisation kicks in past the configured threshold**
+
+![Virtualised 10k tasks demo](docs/screenshots/19-virtual-10k.png)
+
+**Tradie / construction — single-trade sequential bathroom reno**
+
+![Bathroom reno tradie demo](docs/screenshots/40-tradie-bathroom.png)
+
+**Tradie / construction — multi-phase new-build house with WBS rollup**
+
+![New-build house tradie demo](docs/screenshots/41-tradie-house-build.png)
 
 ---
 
