@@ -631,12 +631,143 @@ via `data-gantt-sidebar-columns-value` (JSON array) or via the API.
 - [x] WBS numbering injection
 - [x] Group-by + sort hooks via API
 
-## Phase 9 — Renderers (done)
+## Phase 9 — Renderers
 
-- [x] Label / bar / milestone / dependency registries
-- [x] Template-driven path via `<template>` + `data-bind*`
-- [x] At least 8 built-in bar renderers
-- [x] Per-task renderer override
+Four independent registries (`label`, `bar`, `milestone`,
+`dependency`) live in `src/lib/renderers.js`. Each is opted into via
+`data-task-renderer`, `data-task-bar-renderer`, etc. Hosts can
+register more via the `registerXRenderer(name, fn)` exports.
+
+### 9a — Label renderers (sidebar row)
+
+- [x] `default` — WBS chevron + name + summary/milestone class hooks
+- [x] `template` — clone `<template id="…">` with `data-bind*`
+
+### 9b — Bar renderers (timeline bar)
+
+- [x] `default` — block bar + inset progress stripe
+- [x] `progress-stripe` — bar with `--progress` CSS custom property
+- [x] `resource-stripes` — per-resource colour band
+- [x] `summary` — rolled-up span with corner pips
+- [x] `phase` — wide, low-saturation phase bar
+- [x] `milestone-diamond` — diamond marker (bar registry, mirrors
+      milestone registry for symmetry)
+- [x] `flag` — pennant marker
+- [x] `chevron` — leading-arrow shape
+- [x] `actual-vs-planned` — split bar (top: planned, bottom: actual)
+- [x] `template` — clone `<template id="…">` with `data-bind*`
+
+### 9c — Milestone renderers
+
+- [x] `default` — SVG diamond, picks up `data-task-color`
+- [x] `template` — clone `<template id="…">`
+
+### 9d — Dependency renderers
+
+- [x] `default` — solid stroke arrow
+- [x] `dashed` — dashed stroke (used for soft deps in demos)
+- [ ] `labelled` — arrow with mid-segment lag label (declared in
+      REQUIREMENTS §10; not yet shipped)
+- [ ] `thick-arrow` — wider stroke for critical-path overlay
+      (declared, not yet shipped)
+
+### 9e — Registration API
+
+- [x] `registerLabelRenderer(name, fn)` / `getLabelRenderer(name)`
+- [x] `registerBarRenderer(name, fn)` / `getBarRenderer(name)`
+- [x] `registerMilestoneRenderer(name, fn)` / `getMilestoneRenderer(name)`
+- [x] `registerDependencyRenderer(name, fn)` / `getDependencyRenderer(name)`
+- [x] Per-task `data-task-renderer` overrides chart default
+- [x] Per-task `data-task-bar-renderer` overrides chart default
+- [x] `data-gantt-task-renderer-value` chart-wide default
+- [x] `data-gantt-bar-renderer-value` chart-wide default
+- [x] `data-gantt-milestone-renderer-value` chart-wide default
+- [x] `data-gantt-dependency-renderer-value` chart-wide default
+
+### 9f — Template bindings (`<template>` path)
+
+- [x] `data-bind="field"` → text content
+- [x] `data-bind-text="field"` → formatted text
+- [x] `data-bind-attr="attr:field"` → set attribute
+- [x] Multi-attr: `data-bind-attr="style:--progress:progress"` writes
+      a CSS custom property
+- [x] Demo `demo/28-custom-bar-renderer.html` showcases custom
+      template-driven bar
+
+## Phase 10 — Resource histogram
+
+`src/controllers/gantt_histogram_controller.js`. Optional panel below
+the chart; one row per resource.
+
+- [x] Toggle via `data-gantt-resource-histogram-value="true"`
+- [x] Allocation bars summed per slot of the active view
+- [x] Capacity reference line at the resource's `capacity`
+      (default `1.0`)
+- [x] Overallocation segments shade red
+- [x] `gantt:overallocationDetected` fires once per contiguous
+      interval (debounced, not per-slot)
+- [x] Subscribes to the same data store as the chart — chart mutation
+      reflows histogram on next animation frame
+- [x] Per-resource colour from `data-resource-color`
+- [x] Click a bar → fires `gantt:histogramBarClicked`
+- [x] Demo `demo/15-resource-histogram.html`
+- [x] Demo `demo/16-overallocation.html`
+- [ ] Screenshot `docs/screenshots/sg-overallocation.png`
+
+## Phase 11 — Virtualisation
+
+`src/lib/virtual.js`. Two axes virtualised independently so 10 000+
+tasks render at 60 fps.
+
+### 11a — Row virtualisation
+
+- [x] Threshold via `data-gantt-row-virtual-threshold-value`
+      (default `200`)
+- [x] Recycled DOM nodes on scroll
+- [x] Variable row heights fall back to measure-then-mount per row
+- [x] Force-on via `data-gantt-row-virtualization-value="true"`
+
+### 11b — Column virtualisation
+
+- [x] Off-viewport timeline columns rendered as spacers
+- [x] Bars wholly outside viewport not mounted
+- [x] Bars partially visible mounted
+- [x] Dependency arrows route via visible anchor + off-screen
+      affordance
+- [x] `data-gantt-column-virtualization-value="false"` opt-out
+
+### 11c — Interaction in a virtualised viewport
+
+- [x] Drag a bar off-screen auto-scrolls + resolves drop date against
+      logical timeline
+- [x] `scrollToTask(id)` mounts the row before scrolling
+- [x] Dependency arrows redraw within one frame of scroll
+
+### 11d — Demo & tests
+
+- [x] Demo `demo/19-virtual-10k-tasks.html`
+- [x] `test/virtual.test.js` — row + column recycling, edge cases
+
+## Phase 12 — Filter, sort, group
+
+- [x] `setQuickFilter(q)` — substring against name + all string
+      fields; case-insensitive
+- [x] `data-gantt-quick-filter-value` initial value
+- [x] `data-gantt-filter-mode-value` `"dim"` vs `"hide"` (default
+      `"hide"`)
+- [x] Hidden mode preserves summary parents whose descendants match
+- [x] `setTaskFilter(predicate)` / `getTaskFilter()` for app rules
+- [x] Sort: per-column `sort: 'asc'|'desc'` via
+      `setSidebarColumns`
+- [x] `setSortField(field, dir)` programmatic
+- [x] Sort respects parent/child tree by default
+- [x] `setSortField(field, dir, { flatten: true })` ignores tree
+- [x] `setGroupBy(field)` / `getGroupBy()` — synthetic group rows
+- [x] Group rows are collapsible + collapse state persisted
+- [x] `gantt:filterChanged` event
+- [x] `gantt:groupChanged` event
+- [x] Demo `demo/14-grouping-by-resource.html`
+- [x] Demo `demo/21-quick-filter.html`
 
 ## Phase 10 — Resource histogram (done)
 
