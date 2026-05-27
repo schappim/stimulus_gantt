@@ -992,17 +992,145 @@ mutation envelope shape is `{ op, payload, origin, ts }`.
 - [x] `gantt-task-editor` controller (inline editor)
 - [x] `openTaskDetail` / `closeTaskDetail` API
 
-## Phase 17 — Rails companion gem
+## Phase 17 — Rails companion gem (`stimulus_gantt_rails`)
 
-- [x] Gem skeleton: gemspec, engine, routes
-- [x] `StimulusGanttRails::Gantt` DSL (fields, calendars, dependency types, hooks)
-- [x] `Broadcastable` ActiveRecord concern
-- [x] Tenant-scoped streams (ActsAsTenant integration point)
-- [x] Turbo Stream custom actions
-- [x] Importmap pins
-- [ ] Demo Rails app under `gem/demo/` (skeleton only — full app deferred)
-- [ ] Migration for opt-in audit log + undo/redo (deferred to a follow-up)
-- [ ] `bin/rails test` suite (deferred)
+Mirrors `gem/stimulus_calendar_rails`'s shape: engine, declarative
+DSL, `Broadcastable` concern, custom Turbo Stream actions,
+controllers, view partial, importmap pins, asset pipeline, dummy
+Rails app integration tests. The gem ships under
+`gem/stimulus_gantt_rails/`; the runnable test bed will live under
+`gem/demo/`.
+
+### 17a — Engine internals
+
+- [x] `lib/stimulus_gantt_rails.rb` — module root,
+      `parent_controller=`, `mount_path=`, per-process registry
+      (`register_gantt` / `lookup_gantt`)
+- [x] `lib/stimulus_gantt_rails/version.rb`
+- [x] `lib/stimulus_gantt_rails/engine.rb` — asset precompile,
+      importmap paths, view path appended
+- [x] `config/routes.rb` — `/:resource/events`,
+      `/:resource/dependencies`, `/:resource/resources`,
+      `/:resource/bulk`
+- [x] `config/importmap.rb` — pin `stimulus_gantt`,
+      `stimulus_gantt_rails`
+- [x] `app/assets/javascripts/stimulus_gantt.js` — vendor the IIFE
+      bundle via `bin/sync-rails-assets`
+- [x] `app/assets/javascripts/stimulus_gantt_rails.js` — Stimulus
+      glue + `registerStreamActions` for the custom Gantt Turbo
+      Stream actions
+- [x] `app/assets/stylesheets/stimulus_gantt.css`
+- [ ] `tenant_stream_token` + `streamables_for` helpers
+      (declared in REQUIREMENTS §19; ActsAsTenant wiring deferred to
+      the demo Rails app)
+
+### 17b — Server-side declarative DSL
+
+- [x] `lib/stimulus_gantt_rails/gantt.rb` — base class:
+      `resource`, `model`, `field`, `dependency_types`, `calendar`,
+      `before_update`, `inherited` (subclass dup)
+- [x] `lib/stimulus_gantt_rails/field.rb` — per-field declaration
+      (`type`, `editable`, `validate`, `concurrency`, `values`)
+- [x] `lib/stimulus_gantt_rails/calendar.rb` — `weekdays`, `hours`,
+      `holidays`, `as_json`
+- [x] `Field#editable_for?(row, user)` (boolean or lambda)
+- [x] Type coercion (`:string`, `:datetime`, `:duration`, `:float`,
+      `:array`, `:enum`, `:reference`)
+- [x] `validate` lambda invoked server-side; errors round-trip
+      through the conflict op
+- [ ] `concurrency: :version_checked` — declared, deferred until
+      `lock_version` integration lands in the demo app
+
+### 17c — Custom Turbo Stream actions
+
+- [x] `lib/stimulus_gantt_rails/turbo_streams_helper.rb` (registers
+      the actions on engine boot)
+- [x] `<turbo-stream action="gantt-task-add">` — insert one task by id
+- [x] `<turbo-stream action="gantt-task-update">` — patch one task's
+      fields by id
+- [x] `<turbo-stream action="gantt-task-remove">` — delete one task
+      by id
+- [x] `<turbo-stream action="gantt-dependency-add">`
+- [x] `<turbo-stream action="gantt-dependency-remove">`
+- [x] `<turbo-stream action="gantt-resource-add|update|remove">`
+- [x] `<turbo-stream action="gantt-source-refetch">` (client refetch)
+- [x] `<turbo-stream action="gantt-bulk">` (atomic batched stream)
+- [x] `<turbo-stream action="gantt-conflict">` (server vs client
+      value conflict, e.g. version-checked move)
+
+### 17d — Broadcastable model concern
+
+- [x] `lib/stimulus_gantt_rails/concerns/broadcastable.rb` —
+      `broadcasts_gantt GanttClass`; `after_create_commit`,
+      `after_update_commit`, `after_destroy_commit` callbacks
+      generate `gantt-task-add|update|remove` messages
+- [x] `stream:` lambda for tenant-scoped channel names
+- [ ] Test (`gem/demo/test/models/task_broadcast_test.rb`) — deferred
+      with `gem/demo`
+
+### 17e — Controllers
+
+- [x] `BaseController` / `ApplicationController` (inherits from
+      `StimulusGanttRails.parent_controller`)
+- [x] `EventsController#index` — JSON list scoped by `?start=&end=`
+- [x] `EventsController#create` — accepts `optimistic_id`, persist,
+      relies on Broadcastable to broadcast
+- [x] `EventsController#update` — drag/resize destination; same
+      optimistic-id pattern as `stimulus_calendar_rails`
+- [x] `EventsController#destroy`
+- [x] `EventsController#destroy_bulk`
+- [x] `EventsController#bulk` (transactional multi-change)
+- [x] `DependenciesController#create` / `#destroy`
+- [x] `ResourcesController#index` — JSON list (chip-picker source)
+- [ ] Integration tests under `gem/demo/test/integration/` —
+      deferred with `gem/demo`
+
+### 17f — View partial
+
+- [x] `app/views/stimulus_gantt_rails/gantts/_gantt.html.erb` —
+      renders the `.sg-gantt` container with all
+      `data-controller="gantt"` value attributes derived from the
+      Gantt class + locals
+- [ ] `<%= turbo_stream_from(*StimulusGanttRails.streamables_for(resource)) %>`
+      helper — pending `streamables_for` (§17a)
+- [ ] Helper module for `data-*` value attribute serialisation —
+      pending
+
+### 17g — Dummy Rails app (`gem/demo/`)
+
+- [ ] `app/models/task.rb` — `include Broadcastable`,
+      `broadcasts_gantt ProjectGantt`, validations
+- [ ] `app/models/dependency.rb`
+- [ ] `app/models/resource.rb`
+- [ ] `app/gantts/project_gantt.rb`
+- [ ] `app/controllers/gantts_controller.rb#index`
+- [ ] `db/migrate/…create_tasks.rb`, `…create_dependencies.rb`,
+      `…create_resources.rb`
+- [ ] Fixtures or factory helper
+- [ ] System test: drag a task → other tab updates
+      (capybara-action-cable style)
+
+### 17h — Concurrency & conflicts
+
+- [ ] Per-field `concurrency: :version_checked` honouring
+      `lock_version`
+- [ ] `gantt-conflict` broadcast on stale write
+- [ ] `gem/demo` integration test: stale move → conflict, fresh
+      move → succeed
+
+### 17i — Multi-tenant + auth
+
+- [ ] `parent_controller` config respected by all gem controllers
+- [ ] ActsAsTenant scoping in `streamables_for`
+- [ ] `gem/demo` test: tenant A's broadcast never reaches tenant B
+
+### 17j — Release prep for the gem
+
+- [x] `gem/stimulus_gantt_rails/README.md` — gem-specific quick start
+- [x] `gem/stimulus_gantt_rails/CHANGELOG.md`
+- [ ] `bin/rails stimulus_gantt_rails:install:migrations` task
+      (deferred until the audit-log migration lands)
+- [ ] `gem build stimulus_gantt_rails.gemspec` smoke step in CI
 
 ## Phase 18 — Demos + docs (done)
 
